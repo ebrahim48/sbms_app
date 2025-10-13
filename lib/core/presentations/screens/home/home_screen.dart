@@ -29,7 +29,9 @@ class HomeScreen extends StatelessWidget {
         selectedItemColor: Colors.green[700],
         unselectedItemColor: Colors.grey,
         currentIndex: 0,
-        onTap: (index) {},
+        onTap: (index) {
+
+        },
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.list_alt), label: 'Sales List'),
@@ -65,6 +67,7 @@ class HomeScreen extends StatelessWidget {
                   icon: Icons.add_shopping_cart,
                   title: "Sales",
                   onTap: () {
+                    context.pushNamed(AppRoutes.viewProfileScreen);
 
                   },
                 ),
