@@ -1,5 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sbms_apps/core/presentations/screens/home/create_list_screen.dart';
+import 'package:sbms_apps/core/presentations/screens/home/home_screen.dart';
+import 'package:sbms_apps/core/presentations/screens/home/order_list_screen.dart';
+import 'package:sbms_apps/core/presentations/screens/home/product_list_screen.dart';
 
 
 import '../../presentations/screens/auth/signin/sign_in _screen.dart';
@@ -16,6 +20,10 @@ class AppRoutes {
 
 
   static const String logInScreen = "/logInScreen";
+  static const String homeScreen = "/homeScreen";
+  static const String productListScreen = "/productListScreen";
+  static const String createScreen = "/createScreen";
+  static const String orderListScreen = "/orderListScreen";
 
 
 
@@ -25,19 +33,19 @@ class AppRoutes {
   static final GoRouter goRouter = GoRouter(
     initialLocation: splashScreen,
     routes: [
-      // GoRoute(
-      //   path: splashScreen,
-      //   name: splashScreen,
-      //   builder: (context, state) => const SplashScreen(),
-      //   redirect: (context, state) {
-      //     Future.delayed(const Duration(seconds: 3), () async {
-      //         AppRoutes.goRouter.replaceNamed(AppRoutes.onBoardingScreen);
-      //       }
-      //     );
-      //
-      //     return;
-      //   },
-      // ),
+      GoRoute(
+        path: splashScreen,
+        name: splashScreen,
+        builder: (context, state) => const SplashScreen(),
+        redirect: (context, state) {
+          Future.delayed(const Duration(seconds: 3), () async {
+              AppRoutes.goRouter.replaceNamed(AppRoutes.onBoardingScreen);
+            }
+          );
+
+          return;
+        },
+      ),
 
       ///<<<=============>>> ONBOARDING SCREEN <<<===============>>>
       GoRoute(
@@ -70,6 +78,37 @@ class AppRoutes {
             (context, state) => _customTransitionPage(LoginInScreen(), state),
       ),
 
+
+      ///<<<=============>>> Home Screen<<<===============>>>
+      GoRoute(
+        path: homeScreen,
+        name: homeScreen,
+        pageBuilder:
+            (context, state) => _customTransitionPage(HomeScreen(), state),
+      ),
+
+      ///<<<=============>>> Product List Screen<<<===============>>>
+      GoRoute(
+        path: productListScreen,
+        name: productListScreen,
+        pageBuilder:
+            (context, state) => _customTransitionPage(ProductListScreen(), state),
+      ),
+
+
+      GoRoute(
+        path: createScreen,
+        name: createScreen,
+        pageBuilder:
+            (context, state) => _customTransitionPage(CreateScreen(), state),
+      ),
+
+      GoRoute(
+        path: orderListScreen,
+        name: orderListScreen,
+        pageBuilder:
+            (context, state) => _customTransitionPage(OrderListScreen(), state),
+      ),
 
 
 

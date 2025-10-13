@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
+import 'package:sbms_apps/core/config/app_routes/app_routes.dart';
 import 'dart:ui';
 import '../../../../global/custom_assets/assets.gen.dart';
 import '../../../constants/app_colors.dart';
@@ -80,10 +82,10 @@ class _OnboardingScreenState extends State<OnboardingScreen>
               mainAxisSize: MainAxisSize.min,
               children: [
                 SizedBox(height: 170.h),
-                // Assets.images.onboarding.image(
-                //   width: 322.w,
-                //   height: 301.h,
-                // ),
+                Assets.images.onboarding.image(
+                  width: 322.w,
+                  height: 301.h,
+                ),
                 SizedBox(height: 58.h),
                 CustomText(
                   text: AppString.welcomeLimitIt,
@@ -102,6 +104,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                   child: CustomButton(
                       title: AppString.start,
                       onpress: () {
+                        context.pushNamed(AppRoutes.logInScreen);
 
                       },
 
