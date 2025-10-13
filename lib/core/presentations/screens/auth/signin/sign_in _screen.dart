@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sbms_apps/core/config/app_routes/app_routes.dart';
 
 import '../../../../../global/custom_assets/assets.gen.dart';
 import '../../../../constants/app_colors.dart';
@@ -133,33 +134,35 @@ class LoginInScreen extends StatelessWidget {
                       title: AppString.login,
                       onpress: () {
 
+                        context.pushNamed(AppRoutes.homeScreen);
+
                       },
                     ),
                     SizedBox(height: 12.h),
-                    Center(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          CustomText(
-                            text: AppString.already,
-                            color: AppColors.textColor1A1A1A,
-                            fontsize: 14.sp,
-                            fontWeight: FontWeight.w400,
-                          ),
-                          GestureDetector(
-                            onTap: () {
-
-                            },
-                            child: CustomText(
-                              text: AppString.signUps,
-                              color: AppColors.primaryColor,
-                              fontsize: 14.sp,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                    // Center(
+                    //   child: Row(
+                    //     mainAxisAlignment: MainAxisAlignment.start,
+                    //     children: [
+                    //       CustomText(
+                    //         text: AppString.already,
+                    //         color: AppColors.textColor1A1A1A,
+                    //         fontsize: 14.sp,
+                    //         fontWeight: FontWeight.w400,
+                    //       ),
+                    //       GestureDetector(
+                    //         onTap: () {
+                    //
+                    //         },
+                    //         child: CustomText(
+                    //           text: AppString.signUps,
+                    //           color: AppColors.primaryColor,
+                    //           fontsize: 14.sp,
+                    //           fontWeight: FontWeight.w600,
+                    //         ),
+                    //       ),
+                    //     ],
+                    //   ),
+                    // ),
                     SizedBox(height: 40.h),
                   ],
                 ),
