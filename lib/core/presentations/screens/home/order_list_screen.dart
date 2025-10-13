@@ -120,53 +120,104 @@ class _OrderListScreenState extends State<OrderListScreen> {
               ],
             ),
             SizedBox(height: 16.h),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  SizedBox(
+                    width: 220.w,
+                    child: DropdownButtonFormField<String>(
+                      decoration: const InputDecoration(
+                        labelText: "Type",
+                        border: OutlineInputBorder(),
+                      ),
+                      value: _type,
+                      items: _types
+                          .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                          .toList(),
+                      onChanged: (val) => setState(() => _type = val),
+                    ),
+                  ),
+                  SizedBox(width: 10.w),
+                  SizedBox(
+                    width: 220.w,
+                    child: DropdownButtonFormField<String>(
+                      decoration: const InputDecoration(
+                        labelText: "Branch/Warehouse",
+                        border: OutlineInputBorder(),
+                      ),
+                      value: _branch,
+                      items: _branches
+                          .map((b) => DropdownMenuItem(value: b, child: Text(b)))
+                          .toList(),
+                      onChanged: (val) => setState(() => _branch = val),
+                    ),
+                  ),
+                  SizedBox(width: 10.w),
+                  SizedBox(
+                    width: 220.w,
+                    child: DropdownButtonFormField<String>(
+                      decoration: const InputDecoration(
+                        labelText: "Order Type",
+                        border: OutlineInputBorder(),
+                      ),
+                      value: _orderType,
+                      items: _orderTypes
+                          .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                          .toList(),
+                      onChanged: (val) => setState(() => _orderType = val),
+                    ),
+                  ),
+                ],
+              ),
+            ),
 
             // Row 2: Type, Branch, Order Type
-            Row(
-              children: [
-                Expanded(
-                  child: DropdownButtonFormField<String>(
-                    decoration: const InputDecoration(
-                      labelText: "Type",
-                      border: OutlineInputBorder(),
-                    ),
-                    value: _type,
-                    items: _types
-                        .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                        .toList(),
-                    onChanged: (val) => setState(() => _type = val),
-                  ),
-                ),
-                SizedBox(width: 10.w),
-                Expanded(
-                  child: DropdownButtonFormField<String>(
-                    decoration: const InputDecoration(
-                      labelText: "Branch/Warehouse",
-                      border: OutlineInputBorder(),
-                    ),
-                    value: _branch,
-                    items: _branches
-                        .map((b) => DropdownMenuItem(value: b, child: Text(b)))
-                        .toList(),
-                    onChanged: (val) => setState(() => _branch = val),
-                  ),
-                ),
-                SizedBox(width: 10.w),
-                Expanded(
-                  child: DropdownButtonFormField<String>(
-                    decoration: const InputDecoration(
-                      labelText: "Order Type",
-                      border: OutlineInputBorder(),
-                    ),
-                    value: _orderType,
-                    items: _orderTypes
-                        .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                        .toList(),
-                    onChanged: (val) => setState(() => _orderType = val),
-                  ),
-                ),
-              ],
-            ),
+            // Row(
+            //   children: [
+            //     Expanded(
+            //       child: DropdownButtonFormField<String>(
+            //         decoration: const InputDecoration(
+            //           labelText: "Type",
+            //           border: OutlineInputBorder(),
+            //         ),
+            //         value: _type,
+            //         items: _types
+            //             .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+            //             .toList(),
+            //         onChanged: (val) => setState(() => _type = val),
+            //       ),
+            //     ),
+            //     SizedBox(width: 10.w),
+            //     Expanded(
+            //       child: DropdownButtonFormField<String>(
+            //         decoration: const InputDecoration(
+            //           labelText: "Branch/Warehouse",
+            //           border: OutlineInputBorder(),
+            //         ),
+            //         value: _branch,
+            //         items: _branches
+            //             .map((b) => DropdownMenuItem(value: b, child: Text(b)))
+            //             .toList(),
+            //         onChanged: (val) => setState(() => _branch = val),
+            //       ),
+            //     ),
+            //     SizedBox(width: 6.w),
+            //     Expanded(
+            //       child: DropdownButtonFormField<String>(
+            //         decoration: const InputDecoration(
+            //           labelText: "Order Type",
+            //           border: OutlineInputBorder(),
+            //         ),
+            //         value: _orderType,
+            //         items: _orderTypes
+            //             .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+            //             .toList(),
+            //         onChanged: (val) => setState(() => _orderType = val),
+            //       ),
+            //     ),
+            //   ],
+            // ),
             SizedBox(height: 16.h),
 
             // Product Table
