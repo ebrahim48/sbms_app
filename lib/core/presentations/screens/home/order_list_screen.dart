@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../../constants/app_colors.dart';
+
 class OrderListScreen extends StatefulWidget {
   const OrderListScreen({super.key});
 
@@ -51,7 +53,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.green[700],
+        backgroundColor: AppColors.primaryColor,
         title: const Text(
           "Order Create",
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
@@ -76,7 +78,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
                           labelText: "Date",
                           border: const OutlineInputBorder(),
                           suffixIcon:
-                          const Icon(Icons.calendar_today, color: Colors.green),
+                          const Icon(Icons.calendar_today, color: AppColors.primaryColor),
                         ),
                         controller: TextEditingController(
                           text: _selectedDate == null
@@ -226,7 +228,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
               "Products",
               style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: Colors.green[700],
+                  color: AppColors.primaryColor,
                   fontSize: 16.sp),
             ),
             SizedBox(height: 10.h),
@@ -316,7 +318,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
                               children: [
                                 IconButton(
                                   icon: const Icon(Icons.check_circle,
-                                      color: Colors.green),
+                                      color: AppColors.primaryColor),
                                   onPressed: () {},
                                 ),
                                 IconButton(
@@ -381,7 +383,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
             Center(
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
+                  backgroundColor: AppColors.primaryColor,
                   padding: EdgeInsets.symmetric(horizontal: 40.w, vertical: 12.h),
                 ),
                 onPressed: () {

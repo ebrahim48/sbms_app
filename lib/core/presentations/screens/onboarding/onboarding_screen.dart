@@ -104,8 +104,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                   child: CustomButton(
                       title: AppString.start,
                       onpress: () {
-                        context.pushNamed(AppRoutes.logInScreen);
-
+                        context.pushNamed(AppRoutes.onBoardingStartScreen);
                       },
 
                   ),

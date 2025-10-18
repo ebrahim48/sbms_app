@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sbms_apps/core/config/app_routes/app_routes.dart';
+import 'package:sbms_apps/core/constants/app_colors.dart';
 
 class ProductListScreen extends StatefulWidget {
   const ProductListScreen({super.key});
@@ -37,7 +38,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.green[700],
+        backgroundColor: AppColors.primaryColor,
         title: const Text(
           "Product List",
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),

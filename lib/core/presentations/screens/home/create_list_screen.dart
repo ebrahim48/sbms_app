@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../../constants/app_colors.dart';
+
 class CreateScreen extends StatefulWidget {
   const CreateScreen({super.key});
 
@@ -50,7 +52,7 @@ class _CreateScreenState extends State<CreateScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.green[700],
+        backgroundColor: AppColors.primaryColor,
         title: const Text(
           "Create Bank Received",
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
@@ -73,7 +75,7 @@ class _CreateScreenState extends State<CreateScreen> {
                         decoration: InputDecoration(
                           labelText: "Date",
                           border: OutlineInputBorder(),
-                          suffixIcon: Icon(Icons.calendar_today, color: Colors.green),
+                          suffixIcon: Icon(Icons.calendar_today, color: AppColors.primaryColor),
                         ),
                         controller: TextEditingController(
                           text: _selectedDate == null
@@ -190,7 +192,7 @@ class _CreateScreenState extends State<CreateScreen> {
                 Row(
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.check_circle, color: Colors.green),
+                      icon: const Icon(Icons.check_circle, color: AppColors.primaryColor),
                       onPressed: () {},
                     ),
                     IconButton(
@@ -251,7 +253,7 @@ class _CreateScreenState extends State<CreateScreen> {
             Center(
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
+                  backgroundColor: AppColors.primaryColor,
                   padding: EdgeInsets.symmetric(horizontal: 40.w, vertical: 12.h),
                 ),
                 onPressed: () {

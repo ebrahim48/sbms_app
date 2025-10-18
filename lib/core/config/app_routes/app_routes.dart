@@ -7,6 +7,7 @@ import 'package:sbms_apps/core/presentations/screens/home/product_list_screen.da
 
 
 import '../../presentations/screens/auth/signin/sign_in _screen.dart';
+import '../../presentations/screens/home/sales_list_screen.dart';
 import '../../presentations/screens/onboarding/onboarding_screen.dart';
 import '../../presentations/screens/onboarding/onboarding_start_screen.dart';
 import '../../presentations/screens/profile/view_profile_screen.dart';
@@ -26,6 +27,7 @@ class AppRoutes {
   static const String productListScreen = "/productListScreen";
   static const String createScreen = "/createScreen";
   static const String orderListScreen = "/orderListScreen";
+  static const String salesListScreen = "/salesListScreen";
   static const String viewProfileScreen = "/viewProfileScreen";
   static const String editProfileScreen = "/editProfileScreen";
 
@@ -124,6 +126,12 @@ class AppRoutes {
         name: editProfileScreen,
         pageBuilder:
             (context, state) => _customTransitionPage(EditProfileScreen(), state),
+      ),
+      GoRoute(
+        path: salesListScreen,
+        name: salesListScreen,
+        pageBuilder:
+            (context, state) => _customTransitionPage(SalesListScreen(), state),
       ),
 
 

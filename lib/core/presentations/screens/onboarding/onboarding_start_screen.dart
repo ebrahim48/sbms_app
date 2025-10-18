@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:ui';
 import '../../../../global/custom_assets/assets.gen.dart';
+import '../../../config/app_routes/app_routes.dart';
 import '../../../constants/app_colors.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_text.dart';
@@ -68,65 +69,65 @@ class _OnboardingStartScreenState extends State<OnboardingStartScreen> {
           ),
 
 
-          // SafeArea(
-          //   child: Column(
-          //     children: [
-          //       SizedBox(height: 23.h),
-          //
-          //       // Page indicators
-          //       _buildPageIndicator(),
-          //
-          //       // PageView
-          //       Expanded(
-          //         child: PageView.builder(
-          //           controller: _pageController,
-          //           onPageChanged: (index) {
-          //             setState(() {
-          //               _currentPage = index;
-          //             });
-          //           },
-          //           itemCount: _pages.length,
-          //           itemBuilder: (context, index) {
-          //             return _buildPageContent(_pages[index]);
-          //           },
-          //         ),
-          //       ),
-          //
-          //       // Next button
-          //       Padding(
-          //         padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 32.h),
-          //         child: CustomButton(
-          //           title: _currentPage == _pages.length - 1 ? 'Sign Up Now' : 'Next',
-          //           onpress: _nextPage,
-          //         ),
-          //       ),
-          //     ],
-          //   ),
-          // ),
+          SafeArea(
+            child: Column(
+              children: [
+                SizedBox(height: 23.h),
+
+                // Page indicators
+                _buildPageIndicator(),
+
+                // PageView
+                Expanded(
+                  child: PageView.builder(
+                    controller: _pageController,
+                    onPageChanged: (index) {
+                      setState(() {
+                        _currentPage = index;
+                      });
+                    },
+                    itemCount: _pages.length,
+                    itemBuilder: (context, index) {
+                      return _buildPageContent(_pages[index]);
+                    },
+                  ),
+                ),
+
+                // Next button
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 32.h),
+                  child: CustomButton(
+                    title: _currentPage == _pages.length - 1 ? 'LogIn' : 'Next',
+                    onpress: _nextPage,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
   }
 
-  // Widget _buildPageIndicator() {
-  //   return Row(
-  //     mainAxisAlignment: MainAxisAlignment.center,
-  //     children: List.generate(
-  //       _pages.length,
-  //           (index) => Container(
-  //         width: 64.w,
-  //         height: 5.h,
-  //         margin: EdgeInsets.symmetric(horizontal: 4.w),
-  //         decoration: BoxDecoration(
-  //           borderRadius: BorderRadius.circular(100.r),
-  //           color: _currentPage == index
-  //               ? Color(0xFF4C956C)
-  //               : Color(0xFF888888),
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
+  Widget _buildPageIndicator() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: List.generate(
+        _pages.length,
+            (index) => Container(
+          width: 64.w,
+          height: 5.h,
+          margin: EdgeInsets.symmetric(horizontal: 4.w),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(100.r),
+            color: _currentPage == index
+                ? Color(0xFF4C956C)
+                : Color(0xFF888888),
+          ),
+        ),
+      ),
+    );
+  }
 
   Widget _buildPageContent(OnboardingData data) {
     return Column(
@@ -169,28 +170,28 @@ class _OnboardingStartScreenState extends State<OnboardingStartScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
 
-  // final List<OnboardingData> _pages = [
-  //   OnboardingData(
-  //     image: Assets.images.screentime,
-  //     title: 'Take Control of Your\nScreen Time',
-  //     subtitle: 'Regain Control of Your Digital Life',
-  //   ),
-  //   OnboardingData(
-  //     image: Assets.images.limit,
-  //     title: 'Limit the Apps That\nDistract You',
-  //     subtitle: 'Choose Which Apps to Limit',
-  //   ),
-  //   OnboardingData(
-  //     image: Assets.images.resets,
-  //     title: 'Smart Scheduling &\nDaily Resets',
-  //     subtitle: 'Create Your Perfect Schedule',
-  //   ),
-  //   OnboardingData(
-  //     image: Assets.images.progress,
-  //     title: 'Track Your Progress\n& Improve',
-  //     subtitle: 'Stay Motivated with Weekly Reports',
-  //   ),
-  // ];
+  final List<OnboardingData> _pages = [
+    OnboardingData(
+      image: Assets.images.screentime,
+      title: 'Take Control of Your\nScreen Time',
+      subtitle: 'Regain Control of Your Digital Life',
+    ),
+    OnboardingData(
+      image: Assets.images.limit,
+      title: 'Sbms the Apps That\nDistract You',
+      subtitle: 'Choose Which Apps to Limit',
+    ),
+    OnboardingData(
+      image: Assets.images.resets,
+      title: 'Smart Scheduling &\nDaily Resets',
+      subtitle: 'Create Your Perfect Schedule',
+    ),
+    OnboardingData(
+      image: Assets.images.progress,
+      title: 'Track Your Progress\n& Improve',
+      subtitle: 'Stay Motivated with Weekly Reports',
+    ),
+  ];
 
   @override
   void dispose() {
@@ -198,17 +199,17 @@ class _OnboardingStartScreenState extends State<OnboardingStartScreen> {
     super.dispose();
   }
 
-  // void _nextPage() {
-  //   if (_currentPage < _pages.length - 1) {
-  //     _pageController.nextPage(
-  //       duration: const Duration(milliseconds: 300),
-  //       curve: Curves.easeInOut,
-  //     );
-  //   } else {
-  //     context.pushNamed(AppRoutes.signUpScreen);
-  //
-  //   }
-  // }
+  void _nextPage() {
+    if (_currentPage < _pages.length - 1) {
+      _pageController.nextPage(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    } else {
+      context.pushNamed(AppRoutes.logInScreen);
+
+    }
+  }
 }
 
 
