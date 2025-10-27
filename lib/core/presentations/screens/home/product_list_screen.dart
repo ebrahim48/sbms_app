@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sbms_apps/core/config/app_routes/app_routes.dart';
 import 'package:sbms_apps/core/constants/app_colors.dart';
+
+import '../../../../controllers/product_list_controller.dart';
 
 class ProductListScreen extends StatefulWidget {
   const ProductListScreen({super.key});
@@ -14,27 +18,26 @@ class ProductListScreen extends StatefulWidget {
 class _ProductListScreenState extends State<ProductListScreen> {
   final TextEditingController _searchController = TextEditingController();
 
-  final List<String> _allProducts = [
-    'Affix-100ml (4)',
-    'Affix-500 ml (4)',
-    'Affix-50ml (4)',
-    'Aracta 25WDG-20GM (4)',
-    'Aracta 25WDG-5gm (4)',
-    'BINA Dhan-17-10 Kg (2)',
-    'BINA Dhan-17-2 Kg (2)',
-    'BINA Dhan-25-2 Kg (2)',
-    'Brinjal Special-1L (3)',
-    'Sunrice 50GM (1)',
-  ];
 
   String _searchQuery = '';
 
+
+  ProductListController productListController = Get.put(ProductListController());
+
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      productListController.getProductList();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    final filteredProducts = _allProducts
-        .where((product) =>
-        product.toLowerCase().contains(_searchQuery.toLowerCase()))
-        .toList();
+
+    // final filteredProducts = _allProducts
+    //     .where((product) =>
+    //     product.toLowerCase().contains(_searchQuery.toLowerCase()))
+    //     .toList();
 
     return Scaffold(
       appBar: AppBar(
@@ -53,11 +56,11 @@ class _ProductListScreenState extends State<ProductListScreen> {
             /// Search Field
             TextField(
               controller: _searchController,
-              onChanged: (value) {
-                setState(() {
-                  _searchQuery = value;
-                });
-              },
+              // onChanged: (value) {
+              //   setState(() {
+              //     _searchQuery = value;
+              //   });
+              // },
               decoration: InputDecoration(
                 hintText: "Search",
                 prefixIcon: const Icon(Icons.search, color: Colors.grey),
@@ -76,9 +79,9 @@ class _ProductListScreenState extends State<ProductListScreen> {
             /// Product List
             Expanded(
               child: ListView.builder(
-                itemCount: filteredProducts.length,
+                itemCount: productListController.productList.value.productInfo?.length,
                 itemBuilder: (context, index) {
-                  final product = filteredProducts[index];
+                  final product = productListController.productList.value.productInfo?[index];
                   return Container(
                     margin: EdgeInsets.only(bottom: 10.h),
                     decoration: BoxDecoration(
@@ -93,12 +96,23 @@ class _ProductListScreenState extends State<ProductListScreen> {
                       ],
                     ),
                     child: ListTile(
-                      title: Text(
-                        product,
-                        style: TextStyle(
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.w500,
-                        ),
+                      title: Row(
+                        children: [
+                          Text(
+                           '${product?.id ?? 'N/A'}',
+                            style: TextStyle(
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          Text(
+                           product?.productName ?? 'N/A',
+                            style: TextStyle(
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
                       ),
                       onTap: () {
                         context.pushNamed(AppRoutes.createScreen);
