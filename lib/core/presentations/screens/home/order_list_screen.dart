@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 
+import '../../../../controllers/product_list_controller.dart';
 import '../../../constants/app_colors.dart';
 
 class OrderListScreen extends StatefulWidget {
@@ -11,6 +14,24 @@ class OrderListScreen extends StatefulWidget {
 }
 
 class _OrderListScreenState extends State<OrderListScreen> {
+
+
+  ProductListController productListController = Get.put(ProductListController());
+
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      productListController.getDealerList();
+    });
+  }
+
+
+
+
+
+
+
+
   DateTime? _selectedDate;
   String? _vendorName;
   String? _branch;
@@ -90,6 +111,8 @@ class _OrderListScreenState extends State<OrderListScreen> {
                   ),
                 ),
                 SizedBox(width: 10.w),
+
+                /// =============================> order vendor ==========================>
                 Expanded(
                   flex: 3,
                   child: DropdownButtonFormField<String>(
@@ -105,6 +128,9 @@ class _OrderListScreenState extends State<OrderListScreen> {
                   ),
                 ),
                 SizedBox(width: 10.w),
+
+
+
                 Expanded(
                   child: Container(
                     padding:

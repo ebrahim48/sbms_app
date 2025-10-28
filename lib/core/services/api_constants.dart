@@ -11,6 +11,7 @@ class ApiConstants{
 
 
   static const String getProductListEndPoint = "/api/v2/get-product-list";
+  static const String getDealerListEndPoint = "/api/v2/get-dealer-list";
 
 
 }
