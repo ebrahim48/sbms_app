@@ -44,37 +44,39 @@ class ApiClient extends GetxService {
     }
   }
 
-// //==========================================> Post Data <======================================
-//   static Future<Response> postData(String uri, dynamic body,
-//       {Map<String, String>? headers}) async {
-//     String bearerToken = await PrefsHelper.getString(AppConstants.bearerToken);
-//
-//     var mainHeaders = {
-//       'Content-Type': 'application/json',
-//       'Authorization': bearerToken
-//     };
-//
-//     try {
-//       print('====> API Call: $uri\nHeader: $mainHeaders');
-//       print('====> API Body: $body');
-//
-//       http.Response response = await client.post(
-//         Uri.parse(ApiConstants.baseUrl + uri),
-//         body: body,
-//         headers: headers ?? mainHeaders,
-//       ).timeout(const Duration(seconds: timeoutInSeconds));
-//
-//       print("==========> Response Post Method : ${response.statusCode} \n*********${response.body}");
-//       return handleResponse(response, uri);
-//     } catch (e, s) {
-//       print("===> Error in postData: e$e");
-//       print("===> Error in postData: s$s");
-//       return const Response(statusCode: 1, statusText: noInternetMessage);
-//     }
-//   }
-//
-//
-//
+  static Future<Response> postData(String uri, dynamic body,
+      {Map<String, String>? headers}) async {
+    String bearerToken = await PrefsHelper.getString(AppConstants.bearerToken);
+
+    var mainHeaders = {
+      'Accept': 'application/json', // ✅ recommended to include
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $bearerToken', // ✅ proper format
+    };
+
+    try {
+      print('====> API Call: $uri\nHeader: $mainHeaders');
+      print('====> API Body: $body');
+
+      final response = await client
+          .post(
+        Uri.parse(ApiConstants.baseUrl + uri),
+        body: jsonEncode(body), // ✅ FIXED HERE
+        headers: headers ?? mainHeaders,
+      )
+          .timeout(const Duration(seconds: timeoutInSeconds));
+
+      print(
+          "==========> Response Post Method : ${response.statusCode} \n*********${response.body}");
+      return handleResponse(response, uri);
+    } catch (e, s) {
+      print("===> Error in postData: e$e");
+      print("===> Error in postData: s$s");
+      return const Response(statusCode: 1, statusText: noInternetMessage);
+    }
+  }
+
+
 //
 //   //==========================================> patch<======================================
 //   static Future<Response> patch(

@@ -1,7 +1,12 @@
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 
+import '../core/helpers/toast_message_helper.dart';
 import '../core/models/dealer_info_model.dart';
+import '../core/models/invoice_number_model.dart';
 import '../core/models/product_list_model.dart';
+import '../core/models/product_wise_model.dart';
+import '../core/models/warehouselist_model.dart';
 import '../core/services/api_client.dart';
 import '../core/services/api_constants.dart';
 
@@ -46,6 +51,128 @@ class ProductListController extends GetxController {
       dealerListLoading.value = false;
     }
   }
+
+
+
+
+
+
+  RxBool wareHoseListLoading = false.obs;
+  Rx<WareHouseListModel> wareHouseList = Rx<WareHouseListModel>(WareHouseListModel());
+
+  Future<void> getWareHouseList() async {
+    wareHoseListLoading.value = true;
+    try {
+      var response = await ApiClient.getData(ApiConstants.getWareHouseListEndPoint);
+      if (response.statusCode == 200) {
+        wareHouseList.value = WareHouseListModel.fromJson(response.body['res']);
+      }
+    } catch (e) {
+      print('WareHouse List error: $e');
+    } finally {
+      wareHoseListLoading.value = false;
+    }
+  }
+
+
+
+  RxBool productWisePriceLoading = false.obs;
+  Rx<ProductWisePricetModel> productWisePrice = Rx<ProductWisePricetModel>(ProductWisePricetModel());
+
+  Future<void> getProductWisePrice() async {
+    productWisePriceLoading.value = true;
+    try {
+      var response = await ApiClient.getData(ApiConstants.getProductWiseEndPoint);
+      if (response.statusCode == 200) {
+        productWisePrice.value = ProductWisePricetModel.fromJson(response.body['res']);
+      }
+    } catch (e) {
+      print('ProductWise Price error: $e');
+    } finally {
+      productWisePriceLoading.value = false;
+    }
+  }
+
+
+
+
+  RxBool orderInvoiceNumberLoading = false.obs;
+  Rx<InvoiceNumberModel> invoiceNumber = Rx<InvoiceNumberModel>(InvoiceNumberModel());
+
+  Future<void> getOrderInvoice() async {
+    orderInvoiceNumberLoading.value = true;
+    try {
+      var response = await ApiClient.getData(ApiConstants.getInvoiceNumberEndPoint);
+      if (response.statusCode == 200) {
+        invoiceNumber.value = InvoiceNumberModel.fromJson(response.body['res']);
+      }
+    } catch (e) {
+      print('Invoice Number error: $e');
+    } finally {
+      orderInvoiceNumberLoading.value = false;
+    }
+  }
+
+
+
+
+  var orderLoading = false.obs;
+
+  Future<bool> orderCreateInfo({
+    required String date,
+    required int? dealerId,
+    required String invoiceNo,
+    required int? warehouseId,
+    required List<int> productId,
+    required List<int> price,
+    required List<int> quantity,
+    required List<int> totalPrice,
+    required int grandTotalQty,
+    required int grandTotalPayableAmount,
+    required List<int> totalAmount,
+    String? narration,
+    required BuildContext context,
+  }) async {
+    var body = {
+      "date": date,
+      "dealer_id": dealerId,
+      "invoice_no": invoiceNo,
+      "warehouse_id": warehouseId,
+      "product_id": productId,
+      "price": price,
+      "quantity": quantity,
+      "total_price": totalPrice,
+      "grand_total_qty": grandTotalQty,
+      "garnd_total_payable_amount": grandTotalPayableAmount,
+      "narration": narration ?? "",
+      "total_amount": grandTotalPayableAmount,
+      "total_amount": totalAmount,
+    };
+
+    orderLoading(true);
+
+    try {
+      var response = await ApiClient.postData(
+        ApiConstants.orderCreateEndPoint,
+        body,
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        ToastMessageHelper.showToastMessage("${response.body['msg']}",title: 'Success');
+        return true;
+      } else {
+        ToastMessageHelper.showToastMessage("Order creation failed!");
+        return false;
+      }
+    } catch (e) {
+      ToastMessageHelper.showToastMessage("Something went wrong: $e");
+      return false;
+    } finally {
+      orderLoading(false);
+    }
+  }
+
+
 
 
 
