@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:sbms_apps/core/presentations/widgets/custom_loader.dart';
 
+import '../../../../controllers/bank_create_controller.dart';
 import '../../../constants/app_colors.dart';
 
 class CreateScreen extends StatefulWidget {
@@ -19,16 +23,20 @@ class _CreateScreenState extends State<CreateScreen> {
   // Form values
   DateTime? _selectedDate;
   String? _type;
-  String? _bank;
   String? _dealer;
-  String? _invoice;
-  String? _productCategory;
+
+  int? _selectedBankId;
+  String? _selectedBankName;
+  int? _selectCategoryId;
+  String? _selectCategoryName;
+
+  String? _selectedInvoiceValue;
+  String? _selectedInvoiceLabel;
+  int? _selectedDueAmount;
 
   final List<String> _types = ["Dealer", "Customer"];
   final List<String> _dealers = ["A.C R R Trading", "ABC Traders", "XYZ Ltd"];
-  final List<String> _banks = ["IBBL-AWCA-4896", "DBBL-ACC-2345"];
-  final List<String> _invoices = ["Sal-2944 (2024-12-05)", "Sal-2950 (2025-01-12)"];
-  final List<String> _categories = ["FG-CORN SEED", "FG-WHEAT SEED"];
+
 
   double get totalAmount {
     double amount = double.tryParse(_amountController.text) ?? 0;
@@ -48,6 +56,19 @@ class _CreateScreenState extends State<CreateScreen> {
     }
   }
 
+
+  final BankListController bankListController = Get.put(BankListController());
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      bankListController.getBankList();
+      bankListController.getCategoryList();
+      bankListController.getInvoiceList();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -64,7 +85,7 @@ class _CreateScreenState extends State<CreateScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Date & Narration Row
+            /// ===========================> Date & Narration Row =========================>
             Row(
               children: [
                 Expanded(
@@ -100,7 +121,7 @@ class _CreateScreenState extends State<CreateScreen> {
             ),
             SizedBox(height: 16.h),
 
-            // Type Dropdown
+            /// =======================> Type Dropdown ==========================>
             DropdownButtonFormField<String>(
               decoration: const InputDecoration(
                 labelText: "Type",
@@ -112,36 +133,122 @@ class _CreateScreenState extends State<CreateScreen> {
             ),
             SizedBox(height: 16.h),
 
-            // Bank Selection
-            DropdownButtonFormField<String>(
-              decoration: const InputDecoration(
-                labelText: "Bank",
-                border: OutlineInputBorder(),
-              ),
-              value: _bank,
-              items: _banks.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
-              onChanged: (value) => setState(() => _bank = value),
-            ),
-            SizedBox(height: 8.h),
-            Text(
-              "Balance: 679715.78",
-              style: TextStyle(color: Colors.red[700], fontSize: 14.sp),
-            ),
-            SizedBox(height: 8.h),
+            /// =======================> Bank Selection ==========================>
+            Obx(() {
+              if (bankListController.bankListLoading.value) {
+                return const CustomLoader();
+              }
 
-            // Product Category
-            DropdownButtonFormField<String>(
-              decoration: const InputDecoration(
-                labelText: "Product Category",
-                border: OutlineInputBorder(),
-              ),
-              value: _productCategory,
-              items: _categories.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
-              onChanged: (value) => setState(() => _productCategory = value),
-            ),
+              if (bankListController.bankList.isEmpty) {
+                return const Text("No banks available");
+              }
+
+              return DropdownButtonFormField<int>(
+                decoration: const InputDecoration(
+                  labelText: "Bank",
+                  border: OutlineInputBorder(),
+                ),
+                value: _selectedBankId,
+                items: bankListController.bankList.map((bank) {
+                  return DropdownMenuItem<int>(
+                    value: bank.id,
+                    child: Text(bank.bankName ?? "N/A"),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  setState(() {
+                    _selectedBankId = value;
+                    // Find the selected bank name
+                    _selectedBankName = bankListController.bankList
+                        .firstWhere((bank) => bank.id == value)
+                        .bankName;
+                  });
+
+                  // Print or use the selected values
+                  print("Selected Bank ID: $_selectedBankId");
+                  print("Selected Bank Name: $_selectedBankName");
+                },
+              );
+            }),
+
             SizedBox(height: 16.h),
 
-            // Dealer, Type & Invoice
+            // Display selected values
+            if (_selectedBankId != null)
+              Card(
+                child: Padding(
+                  padding: EdgeInsets.all(16.w),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("Selected Bank ID: $_selectedBankId"),
+                      Text("Selected Bank Name: $_selectedBankName"),
+                    ],
+                  ),
+                ),
+              ),
+            SizedBox(height: 20.h),
+
+            /// =========================> Product Category =========================>
+
+
+            Obx(() {
+              if (bankListController.categoryListLoading.value) {
+                return const CustomLoader();
+              }
+
+              if (bankListController.bankList.isEmpty) {
+                return const Text("No category available");
+              }
+
+              return DropdownButtonFormField<int>(
+                decoration: const InputDecoration(
+                  labelText: "Product Category",
+                  border: OutlineInputBorder(),
+                ),
+                value: _selectCategoryId,
+                items: bankListController.categoryList.map((category) {
+                  return DropdownMenuItem<int>(
+                    value: category.id,
+                    child: Text(category.categoryName ?? "N/A"),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  setState(() {
+                    _selectCategoryId = value;
+                    // Find the selected bank name
+                    _selectCategoryName = bankListController.categoryList
+                        .firstWhere((category) => category.id == value)
+                        .categoryName;
+                  });
+
+                  // Print or use the selected values
+                  print("Selected Category ID: $_selectCategoryId");
+                  print("Selected Category Name: $_selectCategoryName");
+                },
+              );
+            }),
+            SizedBox(height: 16.h),
+
+            // Display selected values
+            if (_selectCategoryId!= null)
+              Card(
+                child: Padding(
+                  padding: EdgeInsets.all(16.w),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("Selected Category ID: $_selectCategoryId"),
+                      Text("Selected Category Name: $_selectCategoryName"),
+                    ],
+                  ),
+                ),
+              ),
+
+
+            SizedBox(height: 16.h),
+
+            /// ===========================>  Dealer, Type & Invoice ========================>
             Row(
               children: [
                 Expanded(
@@ -174,38 +281,106 @@ class _CreateScreenState extends State<CreateScreen> {
             ),
             SizedBox(height: 16.h),
 
-            // Invoice and Action
+            ///=============================> Invoice and Action ============================>
             Row(
               children: [
                 Expanded(
-                  child: DropdownButtonFormField<String>(
-                    decoration: const InputDecoration(
-                      labelText: "Invoice",
-                      border: OutlineInputBorder(),
-                    ),
-                    value: _invoice,
-                    items: _invoices.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
-                    onChanged: (value) => setState(() => _invoice = value),
-                  ),
+                  child: Obx(() {
+                    if (bankListController.invoiceListLoading.value) {
+                      return const Center(child: CustomLoader());
+                    }
+
+                    if (bankListController.invoiceList.isEmpty) {
+                      return DropdownButtonFormField<String>(
+                        decoration: const InputDecoration(
+                          labelText: "Invoice",
+                          border: OutlineInputBorder(),
+                        ),
+                        items: const [],
+                        onChanged: null,
+                        hint: const Text("No invoices available"),
+                      );
+                    }
+
+                    return DropdownButtonFormField<String>(
+                      decoration: const InputDecoration(
+                        labelText: "Invoice",
+                        border: OutlineInputBorder(),
+                      ),
+                      value: _selectedInvoiceValue,
+                      items: bankListController.invoiceList.map((invoice) {
+                        return DropdownMenuItem<String>(
+                          value: invoice.invoiceValue,
+                          child: Text(invoice.invoiceLabel ?? "N/A"),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedInvoiceValue = value;
+
+                          // Find the selected invoice and get all details
+                          final selectedInvoice = bankListController.invoiceList
+                              .firstWhere((invoice) => invoice.invoiceValue == value);
+
+                          _selectedInvoiceLabel = selectedInvoice.invoiceLabel;
+                          _selectedDueAmount = selectedInvoice.dueAmount;
+                        });
+
+                        print("Selected Invoice Value: $_selectedInvoiceValue");
+                        print("Selected Invoice Label: $_selectedInvoiceLabel");
+                        print("Due Amount: $_selectedDueAmount");
+                      },
+                    );
+                  }),
                 ),
                 SizedBox(width: 10.w),
                 Row(
                   children: [
                     IconButton(
                       icon: const Icon(Icons.check_circle, color: AppColors.primaryColor),
-                      onPressed: () {},
+                      onPressed: _handleConfirm,
+                      tooltip: "Confirm Invoice",
                     ),
                     IconButton(
                       icon: const Icon(Icons.cancel, color: Colors.red),
-                      onPressed: () {},
+                      onPressed: _handleCancel,
+                      tooltip: "Cancel Selection",
                     ),
                   ],
                 ),
               ],
             ),
+
             SizedBox(height: 16.h),
 
-            // Bank Charge & Amount
+            // Display selected invoice details
+            if (_selectedInvoiceValue != null)
+              Card(
+                elevation: 2,
+                child: Padding(
+                  padding: EdgeInsets.all(16.w),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Selected Invoice Details",
+                        style: TextStyle(
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primaryColor,
+                        ),
+                      ),
+                      SizedBox(height: 8.h),
+                      _buildDetailRow("Invoice", _selectedInvoiceLabel ?? "N/A"),
+                      _buildDetailRow("Invoice Value", _selectedInvoiceValue ?? "N/A"),
+                      _buildDetailRow("Due Amount", "৳ ${_selectedDueAmount ?? 0}"),
+                    ],
+                  ),
+                ),
+              ),
+            SizedBox(height: 16.h),
+
+            /// ==============================> Bank Charge & Amount ===================================>
             Row(
               children: [
                 Expanded(
@@ -240,7 +415,7 @@ class _CreateScreenState extends State<CreateScreen> {
             ),
             SizedBox(height: 16.h),
 
-            // Total Amount
+            /// =============================>  Total Amount ===========================>
             Center(
               child: Text(
                 "Total Amount : ${totalAmount.toStringAsFixed(2)}/-",
@@ -249,7 +424,7 @@ class _CreateScreenState extends State<CreateScreen> {
             ),
             SizedBox(height: 20.h),
 
-            // Submit Button
+            /// ===============================> Submit Button ==========================>
             Center(
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
@@ -272,4 +447,75 @@ class _CreateScreenState extends State<CreateScreen> {
       ),
     );
   }
+  void _handleConfirm() {
+    if (_selectedInvoiceValue == null) {
+      Get.snackbar(
+        "Error",
+        "Please select an invoice first",
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+      return;
+    }
+
+    print("✅ Confirmed Invoice: $_selectedInvoiceValue");
+    print("✅ Due Amount: $_selectedDueAmount");
+
+    // Your confirm logic here
+    Get.snackbar(
+      "Success",
+      "Invoice $_selectedInvoiceValue confirmed",
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: Colors.green,
+      colorText: Colors.white,
+    );
+  }
+
+  void _handleCancel() {
+    setState(() {
+      _selectedInvoiceValue = null;
+      _selectedInvoiceLabel = null;
+      _selectedDueAmount = null;
+    });
+
+    print("❌ Invoice selection cancelled");
+
+    Get.snackbar(
+      "Cancelled",
+      "Invoice selection cleared",
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: Colors.orange,
+      colorText: Colors.white,
+    );
+  }
+
 }
+Widget _buildDetailRow(String label, String value) {
+  return Padding(
+    padding: EdgeInsets.symmetric(vertical: 4.h),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          "$label:",
+          style: TextStyle(
+            fontSize: 14.sp,
+            fontWeight: FontWeight.w600,
+            color: Colors.grey.shade700,
+          ),
+        ),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 14.sp,
+            fontWeight: FontWeight.w500,
+            color: Colors.black,
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+

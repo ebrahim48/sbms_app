@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
+import 'package:sbms_apps/core/presentations/widgets/custom_loader.dart';
+import '../../../../controllers/sales_order_list_controller.dart';
 import '../../../constants/app_colors.dart';
 
 class SalesListScreen extends StatefulWidget {
@@ -10,28 +13,15 @@ class SalesListScreen extends StatefulWidget {
 }
 
 class _SalesListScreenState extends State<SalesListScreen> {
-  final List<Map<String, dynamic>> salesData = [
-    {
-      "user": "25-09-2025 06:50 pm (Admin)",
-      "vendor": "Abdul Malik Pharmacy",
-      "warehouse": "Bogura",
-      "orderDate": "25-09-2025",
-      "invoice": "Sal-23",
-      "totalQty": 100,
-      "grandTotal": 43750.00,
-      "status": "Confirmed",
-    },
-    {
-      "user": "25-09-2025 01:01 pm (Admin)",
-      "vendor": "Abdul Malik Pharmacy",
-      "warehouse": "Bogura",
-      "orderDate": "25-09-2025",
-      "invoice": "Sal-22",
-      "totalQty": 30,
-      "grandTotal": 15092.00,
-      "status": "Confirmed",
-    },
-  ];
+  final SalesOrderListController salesOrderListController = Get.put(SalesOrderListController());
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      salesOrderListController.getSalesOrderList();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,80 +35,99 @@ class _SalesListScreenState extends State<SalesListScreen> {
         ),
         centerTitle: true,
       ),
-      body: Padding(
-        padding: EdgeInsets.all(12.w),
-        child: ListView.builder(
-          itemCount: salesData.length,
-          itemBuilder: (context, index) {
-            final data = salesData[index];
-            return Container(
-              margin: EdgeInsets.only(bottom: 12.h),
-              padding: EdgeInsets.all(12.w),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10.r),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.2),
-                    blurRadius: 6,
-                    offset: const Offset(0, 3),
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Header Row
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        data["invoice"],
-                        style: TextStyle(
-                          color: Colors.red,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14.sp,
-                        ),
-                      ),
-                      Container(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 10.w, vertical: 4.h),
-                        decoration: BoxDecoration(
-                          color: Colors.green.shade50,
-                          borderRadius: BorderRadius.circular(6.r),
-                          border: Border.all(color: Colors.green.shade400),
-                        ),
-                        child: Text(
-                          data["status"],
+      body: Obx(() {
+        if (salesOrderListController.salesOrderListLoading.value) {
+          return const Center(child: CustomLoader());
+        }
+
+        if (salesOrderListController.salesOrderList.isEmpty) {
+          return const Center(child: Text("No sales orders found"));
+        }
+
+        return Padding(
+          padding: EdgeInsets.all(12.w),
+          child: ListView.builder(
+            itemCount: salesOrderListController.salesOrderList.length,
+            itemBuilder: (context, index) {
+              final data = salesOrderListController.salesOrderList[index];
+              return Container(
+                margin: EdgeInsets.only(bottom: 12.h),
+                padding: EdgeInsets.all(12.w),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10.r),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.2),
+                      blurRadius: 6,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Header Row
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          data.invoiceNo ?? "N/A",
                           style: TextStyle(
-                            color: Colors.green.shade800,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 12.sp,
+                            color: Colors.red,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14.sp,
                           ),
                         ),
-                      ),
-                    ],
-                  ),
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 10.w, vertical: 4.h),
+                          decoration: BoxDecoration(
+                            color: data.orderStatusText == "Confirmed"
+                                ? Colors.green.shade50
+                                : Colors.orange.shade50,
+                            borderRadius: BorderRadius.circular(6.r),
+                            border: Border.all(
+                              color: data.orderStatusText == "Confirmed"
+                                  ? Colors.green.shade400
+                                  : Colors.orange.shade400,
+                            ),
+                          ),
+                          child: Text(
+                            data.orderStatusText ?? "N/A",
+                            style: TextStyle(
+                              color: data.orderStatusText == "Confirmed"
+                                  ? Colors.green.shade800
+                                  : Colors.orange.shade800,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 12.sp,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
 
-                  SizedBox(height: 10.h),
+                    SizedBox(height: 10.h),
 
-                  _buildInfoRow("User", data["user"]),
-                  _buildInfoRow("Vendor", data["vendor"]),
-                  _buildInfoRow("Warehouse", data["warehouse"]),
-                  _buildInfoRow("Order Date", data["orderDate"]),
-                  _buildInfoRow("Total Quantity", data["totalQty"].toString()),
-                  _buildInfoRow(
-                    "Grand Total",
-                    "৳ ${data["grandTotal"].toStringAsFixed(2)}",
-                    valueColor: AppColors.primaryColor,
-                    bold: true,
-                  ),
-                ],
-              ),
-            );
-          },
-        ),
-      ),
+                    _buildInfoRow("User", data.userName ?? "N/A"),
+                    _buildInfoRow("Vendor", data.dealerName ?? "N/A"),
+                    _buildInfoRow("Warehouse", data.warehouseName ?? "N/A"),
+                    _buildInfoRow("Order Date", data.orderDate ?? "N/A"),
+                    _buildInfoRow("Created At", data.createdAt ?? "N/A"),
+                    _buildInfoRow("Total Quantity", data.totalQty ?? "0"),
+                    _buildInfoRow(
+                      "Grand Total",
+                      "৳ ${data.grandTotal ?? "0.00"}",
+                      valueColor: AppColors.primaryColor,
+                      bold: true,
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        );
+      }),
     );
   }
 

@@ -120,8 +120,6 @@ class _ProductListScreenState extends State<ProductListScreen> {
                           ],
                         ),
                         onTap: () {
-                          context.pushNamed(AppRoutes.createScreen);
-
                         },
                       ),
                     );

@@ -81,6 +81,13 @@ class HomeScreen extends StatelessWidget {
                     context.pushNamed(AppRoutes.orderListScreen);
                   },
                 ),
+                _buildMenuButton(
+                  icon: Icons.food_bank_outlined,
+                  title: "Bank Create",
+                  onTap: () {
+                    context.pushNamed(AppRoutes.createScreen);
+                  },
+                ),
               ],
             ),
           ],
@@ -216,7 +223,7 @@ class HomeScreen extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(12.r),
       child: Container(
-        width: 90.w,
+        width: 80.w,
         padding: EdgeInsets.symmetric(vertical: 16.h),
         decoration: BoxDecoration(
           color: AppColors.primaryColor,

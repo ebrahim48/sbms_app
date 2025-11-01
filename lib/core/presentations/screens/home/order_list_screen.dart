@@ -507,7 +507,6 @@ class _OrderListScreenState extends State<OrderListScreen> {
                     title: 'Order Confirm',
                     onpress: () {
                       if (formKey.currentState!.validate()) {
-                        // 🧩 Step 1: Prepare product list data
                         final productList = _products;
 
                         final productIds = productList.map((p) => p["id"] as int).toList();
@@ -530,7 +529,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
                         final formattedDate =
                             "${_selectedDate!.year}-${_selectedDate!.month.toString().padLeft(2, '0')}-${_selectedDate!.day.toString().padLeft(2, '0')}";
 
-                        // ✅ Step 4: Call API with proper total_amount array
+
                         productListController.orderCreateInfo(
                           date: formattedDate,
                           dealerId: productListController.dealerList.value.dealerInfo
@@ -548,7 +547,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
                           grandTotalPayableAmount: grandTotalPayableAmount,
                           narration: _narrationController.text.trim(),
                           context: context,
-                          totalAmount: totals, // ✅ নতুন ফিল্ড: total_amount পাঠানো হচ্ছে UI থেকে
+                          totalAmount: totals,
                         );
                       }
                     },
