@@ -186,14 +186,14 @@ class _OrderListScreenState extends State<OrderListScreen> {
                               Text(
                                 '${dealer.id ?? 'N/A'} - ',
                                 style: TextStyle(
-                                  fontSize: 16.sp,
+                                  fontSize: 12.sp,
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
                               Text(
                                 dealer.dealerName ?? 'N/A',
                                 style: TextStyle(
-                                  fontSize: 16.sp,
+                                  fontSize: 12.sp,
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
@@ -205,8 +205,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
                         isExpanded: true,
                         menuMaxHeight: 300,
                       ),
-                    ),
-                  ),
+                    ),),
 
 
 

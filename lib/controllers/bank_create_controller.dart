@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import '../core/helpers/toast_message_helper.dart';
 import '../core/models/bank_list_model.dart';
 import '../core/models/category_model.dart';
 import '../core/models/invoice_list_model.dart';
@@ -50,24 +52,84 @@ class BankListController extends GetxController {
   }
 
 
-
   RxBool invoiceListLoading = false.obs;
   RxList<InvoiceListModel> invoiceList = <InvoiceListModel>[].obs;
 
-  Future<void> getInvoiceList() async {
+  Future<void> getInvoiceList({int? dealerId}) async {
     invoiceListLoading.value = true;
     try {
-      var response = await ApiClient.getData(ApiConstants.getDealerInvoiceListEndPoint);
+      // Build endpoint with dealer ID if provided
+      String endpoint = dealerId != null
+          ? '${ApiConstants.getDealerInvoiceListEndPoint}/$dealerId'
+          : ApiConstants.getDealerInvoiceListEndPoint;
+
+      print("Fetching invoices from: $endpoint");
+
+      var response = await ApiClient.getData(endpoint);
       if (response.statusCode == 200) {
         List<dynamic> data = response.body['res']['invoice_info'];
         invoiceList.value = data.map((json) => InvoiceListModel.fromJson(json)).toList();
+
+        print("✅ Loaded ${invoiceList.length} invoices");
       }
     } catch (e) {
       print('Invoice List error: $e');
+      invoiceList.value = []; // Clear list on error
     } finally {
       invoiceListLoading.value = false;
     }
   }
+
+
+  var bankReceiveLoading = false.obs;
+
+  Future<bool> bankReceiveStore({
+    required String paymentDate,
+    required List<int> dealerId,
+    required List<int> bankId,
+    required List<int> categoryId,
+    required List<String> balanceType,
+    required List<String> salesInvoice,
+    required List<int> bankCharge,
+    required List<int> amount,
+    String? paymentDescription,
+    required BuildContext context,
+  }) async {
+    var body = {
+      "payment_date": paymentDate,
+      "dealer_id": dealerId,
+      "bank_id": bankId,
+      "category_id": categoryId,
+      "balance_type": balanceType,
+      "sales_invoice": salesInvoice,
+      "bank_charge": bankCharge,
+      "amount": amount,
+      "payment_description": paymentDescription,
+    };
+
+    bankReceiveLoading(true);
+
+    try {
+      var response = await ApiClient.postData(
+        ApiConstants.bankReceiveEndPoint,
+        body,
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        ToastMessageHelper.showToastMessage("${response.body['msg']}", title: 'Success');
+        return true;
+      } else {
+        ToastMessageHelper.showToastMessage("Bank Receive failed!");
+        return false;
+      }
+    } catch (e) {
+      ToastMessageHelper.showToastMessage("Something went wrong: $e");
+      return false;
+    } finally {
+      bankReceiveLoading(false);
+    }
+  }
+
 
 
 

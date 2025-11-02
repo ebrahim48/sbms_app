@@ -43,7 +43,7 @@ class ProductListController extends GetxController {
     try {
       var response = await ApiClient.getData(ApiConstants.getDealerListEndPoint);
       if (response.statusCode == 200) {
-        productList.value = ProductListModel.fromJson(response.body['res']);
+        dealerList.value = DealerInfoModel.fromJson(response.body['res']);
       }
     } catch (e) {
       print('Product List error: $e');
