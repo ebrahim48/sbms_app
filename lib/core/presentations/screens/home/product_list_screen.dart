@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:go_router/go_router.dart';
-import 'package:sbms_apps/core/config/app_routes/app_routes.dart';
 import 'package:sbms_apps/core/constants/app_colors.dart';
 
 import '../../../../controllers/product_list_controller.dart';
@@ -19,12 +16,11 @@ class ProductListScreen extends StatefulWidget {
 class _ProductListScreenState extends State<ProductListScreen> {
   final TextEditingController _searchController = TextEditingController();
 
-
   String _searchQuery = '';
-
 
   ProductListController productListController = Get.put(ProductListController());
 
+  @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -34,12 +30,6 @@ class _ProductListScreenState extends State<ProductListScreen> {
 
   @override
   Widget build(BuildContext context) {
-
-    // final filteredProducts = _allProducts
-    //     .where((product) =>
-    //     product.toLowerCase().contains(_searchQuery.toLowerCase()))
-    //     .toList();
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.primaryColor,
@@ -57,11 +47,11 @@ class _ProductListScreenState extends State<ProductListScreen> {
             /// Search Field
             TextField(
               controller: _searchController,
-              // onChanged: (value) {
-              //   setState(() {
-              //     _searchQuery = value;
-              //   });
-              // },
+              onChanged: (value) {
+                setState(() {
+                  _searchQuery = value;
+                });
+              },
               decoration: InputDecoration(
                 hintText: "Search",
                 prefixIcon: const Icon(Icons.search, color: Colors.grey),
@@ -78,15 +68,27 @@ class _ProductListScreenState extends State<ProductListScreen> {
             SizedBox(height: 16.h),
 
             /// Product List
-            Obx((){
+            Obx(() {
               if (productListController.productListLoading.value) {
                 return const Center(child: CustomLoader());
               }
-             return Expanded(
+
+              // Filter products based on search query
+              final allProducts = productListController.productList.value.productInfo ?? [];
+              final filteredProducts = _searchQuery.isEmpty
+                  ? allProducts
+                  : allProducts.where((product) {
+                final productName = product?.productName?.toLowerCase() ?? '';
+                final productId = product?.id?.toString().toLowerCase() ?? '';
+                final query = _searchQuery.toLowerCase();
+                return productName.contains(query) || productId.contains(query);
+              }).toList();
+
+              return Expanded(
                 child: ListView.builder(
-                  itemCount: productListController.productList.value.productInfo?.length,
+                  itemCount: filteredProducts.length,
                   itemBuilder: (context, index) {
-                    final product = productListController.productList.value.productInfo?[index];
+                    final product = filteredProducts[index];
                     return Container(
                       margin: EdgeInsets.only(bottom: 10.h),
                       decoration: BoxDecoration(
@@ -104,14 +106,14 @@ class _ProductListScreenState extends State<ProductListScreen> {
                         title: Row(
                           children: [
                             Text(
-                              '${product?.id ?? 'N/A'}',
+                              '${product.id ?? 'N/A'}',
                               style: TextStyle(
                                 fontSize: 16.sp,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
                             Text(
-                              product?.productName ?? 'N/A',
+                              product.productName ?? 'N/A',
                               style: TextStyle(
                                 fontSize: 16.sp,
                                 fontWeight: FontWeight.w500,
@@ -119,16 +121,13 @@ class _ProductListScreenState extends State<ProductListScreen> {
                             ),
                           ],
                         ),
-                        onTap: () {
-                        },
+                        onTap: () {},
                       ),
                     );
                   },
                 ),
               );
-            }
-
-            ),
+            }),
           ],
         ),
       ),

@@ -37,8 +37,12 @@ class HomeScreen extends StatelessWidget {
         },
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.list_alt), label: 'Sales List'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.list_alt),
+              label: 'Sales List'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.person),
+              label: 'Profile'),
         ],
       ),
       body: SingleChildScrollView(
