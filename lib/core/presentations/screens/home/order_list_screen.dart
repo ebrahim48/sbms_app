@@ -5,7 +5,7 @@ import 'package:sbms_apps/core/presentations/widgets/custom_button.dart';
 import '../../../../controllers/product_list_controller.dart';
 import '../../../constants/app_colors.dart';
 import '../../../helpers/toast_message_helper.dart';
-import '../../../models/dealer_info_model.dart';
+import '../../../models/product_list_model.dart';
 import '../../../models/warehouselist_model.dart';
 import '../../widgets/custom_loader.dart';
 
@@ -18,7 +18,6 @@ class OrderListScreen extends StatefulWidget {
 
 class _OrderListScreenState extends State<OrderListScreen> {
 
-
   ProductListController productListController = Get.put(ProductListController());
 
   void initState() {
@@ -28,11 +27,36 @@ class _OrderListScreenState extends State<OrderListScreen> {
       productListController.getWareHouseList();
       productListController.getProductWisePrice();
       productListController.getOrderInvoice();
+      productListController.getProductList().then((_) async {
+        // After getting product list, fetch prices for each product
+        final products = productListController.productList.value.productInfo ?? [];
+        for (var product in products) {
+          if (product?.id != null) {
+            await productListController.getProductWisePriceForProduct(product.id!);
+          }
+        }
+      });
     });
   }
 
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  String _searchQuery = '';
+
+  // State variables for order management
+  List<Map<String, dynamic>> _selectedProducts = []; // Stores products added to the order
+  List<double> _productQuantities = []; // Stores quantities for all available products
+  List<double> _selectedProductQuantities = []; // Stores quantities for selected products only
+  List<bool> _productSelections = [];
+  bool _isProductListVisible = false; // To control visibility of product list
+  String _searchQuery = "";
+  final TextEditingController _searchController = TextEditingController();
+  final TextEditingController _narrationController = TextEditingController();
+  DateTime? _selectedDate;
+  String? _vendorName;
+  int? _vendorId;
+  String? _branch;
+  int? _warehouseId;
+  String? _type;
+  final List<String> _types = ["Finished Goods"];
 
 
   @override
@@ -159,18 +183,18 @@ class _OrderListScreenState extends State<OrderListScreen> {
                     if (productListController.orderInvoiceNumberLoading.value) {
                       return const Center(child: CustomLoader());
                     }
-                   return Expanded(
+                    return Expanded(
                       child: Container(
-                        padding:
-                        EdgeInsets.symmetric(horizontal: 8.w, vertical: 12.h),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.redAccent),
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        child: Text(
-                          "Invoice No: ${productListController.invoiceNumber.value.invoiceNo ?? 'N/A'}",
-                          style: TextStyle(color: Colors.red),
-                        )
+                          padding:
+                          EdgeInsets.symmetric(horizontal: 8.w, vertical: 12.h),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.redAccent),
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          child: Text(
+                            "Invoice No: ${productListController.invoiceNumber.value.invoiceNo ?? 'N/A'}",
+                            style: TextStyle(color: Colors.red),
+                          )
 
                       ),
                     );
@@ -250,127 +274,216 @@ class _OrderListScreenState extends State<OrderListScreen> {
                 ),
               ),
               SizedBox(height: 16.h),
-              ///======================================> Product Table ==============================>
-              const Divider(),
-              Text(
-                "Products",
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primaryColor,
-                    fontSize: 16.sp),
+
+              ///======================================> Product Selection Section ==============================>
+              // Section with toggle button and search
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 8.w),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[100],
+                        borderRadius: BorderRadius.circular(8.r),
+                        border: Border.all(
+                          color: Colors.grey.shade300,
+                        ),
+                      ),
+                      child: TextField(
+                        controller: _searchController,
+                        decoration: InputDecoration(
+                          hintText: "Select products",
+                          // prefixIcon: Icon(Icons.search, color: AppColors.primaryColor),
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 8.w),
+                        ),
+                        enabled: _isProductListVisible, // Disable search when product list is hidden
+                        onChanged: (value) {
+                          setState(() {
+                            _searchQuery = value.toLowerCase();
+                          });
+                        },
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 12.w),
+                  // "+" button to show product list
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryColor,
+                      shape: BoxShape.circle,
+                    ),
+                    child: IconButton(
+                      icon: Icon(
+                        Icons.add,
+                        color: Colors.white,
+                        size: 15.sp,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _isProductListVisible = !_isProductListVisible;
+                        });
+                      },
+                      tooltip: _isProductListVisible ? 'Hide Products' : 'Show Products',
+                    ),
+                  ),
+                ],
               ),
               SizedBox(height: 10.h),
 
-              Obx(() {
-            if (productListController.productWisePriceLoading.value) {
-              return const Center(child: CustomLoader());
-            }
-            return ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: _products.length,
-              itemBuilder: (context, index) {
-                final product = _products[index];
-                return Card(
-                  elevation: 1,
-                  margin: EdgeInsets.symmetric(vertical: 6.h),
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
-                    child: Column(
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              flex: 2,
-                              child: Text(
-                                product["name"],
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                            Expanded(
-                              child: Text(
-                                "Stock: ${productListController.productWisePrice.value.productInfo?.stock ?? "N/A"}",
-                                style: TextStyle(color: Colors.red),
-                              ),
-                            ),
-                          ],
+              ///======================================> Product Section ==============================>
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "Products",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primaryColor,
+                        fontSize: 16.sp),
+                  ),
+                  // Add icon with popup to show selected products
+                  IconButton(
+                    icon: Icon(Icons.add_circle, color: AppColors.primaryColor),
+                    tooltip: "View Selected Products",
+                    onPressed: () {
+                      _showSelectedProductsPopup();
+                    },
+                  ),
+                ],
+              ),
+              SizedBox(height: 10.h),
+
+              // Product Selection Dropdown - Only visible when toggle is on
+              if (_isProductListVisible) ...[
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[50],
+                    borderRadius: BorderRadius.circular(8.r),
+                    border: Border.all(
+                      color: Colors.grey.shade300,
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Select Product:",
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14.sp,
+                          color: Colors.grey.shade700,
                         ),
-                        SizedBox(height: 8.h),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                "Price: ${productListController.productWisePrice.value.productInfo?.price ?? "N/A"}",
-                                style: TextStyle(color: Colors.black),
-                              ),
-                            ),
-                            SizedBox(width: 8.w),
-                            Expanded(
-                              child: TextFormField(
-                                initialValue: product["qty"].toString(),
-                                decoration: const InputDecoration(
-                                  labelText: "Quantity",
-                                  border: OutlineInputBorder(),
-                                ),
-                                keyboardType: TextInputType.number,
-                                onChanged: (val) {
-                                  setState(() => product["qty"] = double.tryParse(val) ?? 0);
-                                },
-                              ),
-                            ),
-                            SizedBox(width: 8.w),
-                            Expanded(
-                              child: Container(
-                                padding: EdgeInsets.all(12.w),
-                                decoration: BoxDecoration(
-                                  border: Border.all(color: Colors.grey),
-                                  borderRadius: BorderRadius.circular(5),
-                                ),
-                                child: Text(
-                                  ((product["price"] as num) * (product["qty"] as num))
-                                      .toStringAsFixed(2),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                            ),
-                            SizedBox(width: 8.w),
-                            Column(
+                      ),
+                      SizedBox(height: 8.h),
+                      _buildProductSelectionDropdown(),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 12.h),
+              ],
+
+              // Selected Products List (similar to existing functionality)
+              _selectedProducts.isEmpty
+                  ? Container(
+                padding: EdgeInsets.all(16.w),
+                alignment: Alignment.center,
+                child: Text(
+                  "No products selected yet. Click the + icon to add products.",
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              )
+                  : ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: _selectedProducts.length,
+                itemBuilder: (context, index) {
+                  final selectedProduct = _selectedProducts[index];
+                  return Card(
+                    elevation: 1,
+                    margin: EdgeInsets.symmetric(vertical: 6.h),
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            flex: 3,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                IconButton(
-                                  icon: const Icon(Icons.check_circle,
-                                      color: AppColors.primaryColor),
-                                  onPressed: () {
-                                    // Check icon a click korle product add hobe
-                                    setState(() {
-                                      _products.add({
-                                        "name": product["name"],
-                                        "price": product["price"],
-                                        "qty": product["qty"],
-                                        // Add any other necessary fields
-                                      });
-                                    });
-                                  },
+                                Text(
+                                  selectedProduct["name"] ?? 'N/A',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
-                                IconButton(
-                                  icon: const Icon(Icons.cancel, color: Colors.red),
-                                  onPressed: () {
-                                    // Cross icon a click korle product remove hobe
-                                    setState(() => _products.removeAt(index));
-                                  },
+                                SizedBox(height: 4.h),
+                                Text(
+                                  "Price: ৳${selectedProduct["price"]}",
+                                  style: TextStyle(color: Colors.black54),
                                 ),
                               ],
                             ),
-                          ],
-                        ),
-                      ],
+                          ),
+                          Expanded(
+                            flex: 2,
+                            child: TextFormField(
+                              initialValue: _selectedProductQuantities[index]?.toString() ?? "1",
+                              decoration: const InputDecoration(
+                                labelText: "Quantity",
+                                border: OutlineInputBorder(),
+                              ),
+                              keyboardType: TextInputType.number,
+                              onChanged: (val) {
+                                setState(() {
+                                  _selectedProductQuantities[index] = double.tryParse(val) ?? 1;
+                                  // Update the quantity in the selected product
+                                  _selectedProducts[index]["qty"] = _selectedProductQuantities[index];
+                                });
+                              },
+                            ),
+                          ),
+                          SizedBox(width: 8.w),
+                          Expanded(
+                            child: Container(
+                              padding: EdgeInsets.all(8.w),
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.grey),
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                              child: Text(
+                                (selectedProduct["price"] * _selectedProductQuantities[index])
+                                    .toStringAsFixed(2),
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 8.w),
+                          IconButton(
+                            icon: Icon(Icons.delete, color: Colors.red),
+                            onPressed: () {
+                              setState(() {
+                                _selectedProducts.removeAt(index);
+                                _selectedProductQuantities.removeAt(index);
+                              });
+                            },
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                );
-              },
-            );
-          }),
+                  );
+                },
+              ),
+
               SizedBox(height: 16.h),
-// =====================> Grand Total Summary <=====================
+              /// =====================> Grand Total Summary <=====================
               Container(
                 width: double.infinity,
                 padding: EdgeInsets.all(12.w),
@@ -404,7 +517,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
                           ),
                         ),
                         Text(
-                          "${_products.fold<int>(0, (sum, item) => sum + (item['qty'] as num).toInt())}",
+                          "${_selectedProducts.fold<int>(0, (sum, item) => sum + (item['qty'] as num).toInt())}",
                           style: TextStyle(
                             fontSize: 14.sp,
                             fontWeight: FontWeight.bold,
@@ -426,7 +539,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
                           ),
                         ),
                         Text(
-                          "৳ ${_products.fold<num>(0, (sum, item) => sum + (item['price'] as num) * (item['qty'] as num))}",
+                          "৳ ${_selectedProducts.fold<num>(0, (sum, item) => sum + (item['price'] as num) * (item['qty'] as num))}",
                           style: TextStyle(
                             fontSize: 14.sp,
                             fontWeight: FontWeight.bold,
@@ -440,6 +553,8 @@ class _OrderListScreenState extends State<OrderListScreen> {
               ),
               SizedBox(height: 16.h),
               /// =================================> Narration  =============================>
+
+
               TextFormField(
                 controller: _narrationController,
                 maxLines: 2,
@@ -447,17 +562,32 @@ class _OrderListScreenState extends State<OrderListScreen> {
                   labelText: "Narration",
                   border: OutlineInputBorder(),
                 ),
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return "Narration cannot be empty";
+                  }
+                  if (value.length > 255) {
+                    return "Narration cannot exceed 255 characters";
+                  }
+                  // Optional: Allow only letters, numbers, basic punctuation
+                  final validPattern = RegExp(r'^[a-zA-Z0-9\s.,!?()-]*$');
+                  if (!validPattern.hasMatch(value)) {
+                    return "Invalid characters in narration";
+                  }
+                  return null; // Valid
+                },
               ),
+
               SizedBox(height: 16.h),
 
               SizedBox(height: 20.h),
               Obx(() =>
                   CustomButton(
-                    loading: productListController.orderLoading.value,
-                    title: 'Order Confirm',
+                      loading: productListController.orderLoading.value,
+                      title: 'Order Confirm',
                       onpress: () {
                         if (formKey.currentState!.validate()) {
-                          final productList = _products;
+                          final productList = _selectedProducts;
 
                           // 🧩 Safe extraction of product IDs and numeric fields
                           final productIds = productList.map((p) {
@@ -587,27 +717,254 @@ class _OrderListScreenState extends State<OrderListScreen> {
     );
   }
 
+  // Show a dialog with searchable product list
+  Future<void> _showSearchableProductDialog() async {
+    final products = (productListController.productList.value.productInfo ?? []);
+    List<dynamic> filteredProducts = List.from(products);
+    String searchQuery = '';
 
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return AlertDialog(
+              title: Column(
+                children: [
+                  TextField(
+                    decoration: InputDecoration(
+                      hintText: "Search products...",
+                      prefixIcon: Icon(Icons.search, color: AppColors.primaryColor),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        searchQuery = value.toLowerCase();
+                        filteredProducts = products.where((product) {
+                          final name = (product?.productName ?? '').toLowerCase();
+                          final id = (product?.id?.toString() ?? '').toLowerCase();
+                          return name.contains(searchQuery) || id.contains(searchQuery);
+                        }).toList();
+                      });
+                    },
+                  ),
+                  SizedBox(height: 10),
+                  Divider(),
+                ],
+              ),
+              content: Container(
+                width: double.maxFinite,
+                height: MediaQuery.of(context).size.height * 0.6,
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: filteredProducts.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    final product = filteredProducts[index];
+                    return ListTile(
+                      title: Text(
+                        product?.productName ?? 'N/A',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      subtitle: Text('ID: ${product?.id ?? 'N/A'}'),
+                      onTap: () {
+                        _showProductDetailsDialog(product);
+                        Navigator.of(context).pop();
+                      },
+                    );
+                  },
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('Cancel', style: TextStyle(color: Colors.red)),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
 
-  DateTime? _selectedDate;
-  String? _vendorName;
-  int? _vendorId;
-  String? _branch;
-  int? _warehouseId;
-  String? _type;
-  final TextEditingController _narrationController = TextEditingController();
+  Widget _buildProductSelectionDropdown() {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 8.w),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(6.r),
+        border: Border.all(
+          color: Colors.grey.shade400,
+        ),
+      ),
+      child: TextButton(
+        onPressed: () {
+          _showSearchableProductDialog();
+        },
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              "Select a product...",
+              style: TextStyle(
+                color: Colors.grey.shade600,
+                fontSize: 14.sp,
+              ),
+            ),
+            Icon(
+              Icons.arrow_drop_down,
+              color: Colors.grey.shade600,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
+  // Show product details in a dialog when selected from dropdown
+  Future<void> _showProductDetailsDialog(ProductInfo product) async {
+    // Get price and stock info for the selected product
+    var priceInfo = productListController.productPriceMap[product.id!];
+    if (priceInfo == null) {
+      // If not in cache, fetch it
+      priceInfo = await productListController.getProductWisePriceForProduct(product.id!);
+    }
 
-  final List<String> _types = ["Finished Goods"];
+    // Initialize quantity for this product as empty
+    String currentQuantity = '';
 
-  final List<Map<String, dynamic>> _products = [
-    {"id": 1, "name": "Affix-100ml", "price": 500.0, "qty": 2},
-    {"id": 2, "name": "Aracta 25WDG-20GM", "price": 800.0, "qty": 1},
-    {"id": 3, "name": "Bravo-250ml", "price": 300.0, "qty": 5},
-    {"id": 4, "name": "Combo-1L", "price": 200.0, "qty": 3},
-  ];
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: Text(
+                product.productName ?? 'Product Details',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.primaryColor,
+                ),
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Product ID: ${product.id}",
+                    style: TextStyle(fontSize: 14.sp),
+                  ),
+                  SizedBox(height: 8.h),
+                  Text(
+                    "Price: ৳${priceInfo?.productInfo?.price ?? 'N/A'}",
+                    style: TextStyle(fontSize: 14.sp, color: Colors.green),
+                  ),
+                  SizedBox(height: 8.h),
+                  Text(
+                    "Stock: ${priceInfo?.productInfo?.stock ?? 'N/A'}",
+                    style: TextStyle(fontSize: 14.sp, color: Colors.red),
+                  ),
+                  SizedBox(height: 16.h),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextFormField(
+                          initialValue: currentQuantity,
+                          decoration: InputDecoration(
+                            labelText: "Quantity",
+                            hintText: "Enter quantity",
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(6.r),
+                            ),
+                          ),
+                          keyboardType: TextInputType.number,
+                          onChanged: (value) {
+                            // Update the quantity
+                            currentQuantity = value;
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('Cancel', style: TextStyle(color: Colors.red)),
+                ),
+                TextButton(
+                  onPressed: () {
+                    // Validate that quantity is provided
+                    final quantityValue = double.tryParse(currentQuantity);
+                    if (quantityValue == null || quantityValue <= 0) {
+                      // Show error message
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text("Please enter a valid quantity"),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                      return; // Don't proceed if no valid quantity
+                    }
 
+                    // Add product to selected list
+                    setState(() {
+                      // Check if product is already in the list
+                      int existingIndex = -1;
+                      for (int i = 0; i < _selectedProducts.length; i++) {
+                        if (_selectedProducts[i]['id'] == product.id) {
+                          existingIndex = i;
+                          break;
+                        }
+                      }
 
+                      if (existingIndex != -1) {
+                        // Update the existing product quantity
+                        _selectedProducts[existingIndex] = {
+                          'id': product.id,
+                          'name': product.productName,
+                          'price': double.tryParse(priceInfo?.productInfo?.price ?? "0") ?? 0,
+                          'qty': quantityValue,
+                        };
+                      } else {
+                        // Add new product
+                        _selectedProducts.add({
+                          'id': product.id,
+                          'name': product.productName,
+                          'price': double.tryParse(priceInfo?.productInfo?.price ?? "0") ?? 0,
+                          'qty': quantityValue,
+                        });
+                      }
+                      // Also update the selected product quantities list
+                      if (existingIndex != -1) {
+                        _selectedProductQuantities[existingIndex] = quantityValue;
+                      } else {
+                        _selectedProductQuantities.add(quantityValue);
+                      }
+                    });
+                    Navigator.of(context).pop();
+                  },
+                  child: Text(
+                    'Add to Order',
+                    style: TextStyle(color: AppColors.primaryColor),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
 
   Future<void> _pickDate() async {
     final picked = await showDatePicker(
@@ -694,6 +1051,124 @@ class _OrderListScreenState extends State<OrderListScreen> {
               ],
             );
           },
+        );
+      },
+    );
+  }
+
+  // Show a dialog with selected products
+  Future<void> _showSelectedProductsPopup() async {
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "Selected Products (${_selectedProducts.length})",
+                style: TextStyle(
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.primaryColor,
+                ),
+              ),
+              IconButton(
+                icon: Icon(Icons.close),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          ),
+          content: Container(
+            width: double.maxFinite,
+            // Limit height to make it scrollable if there are many products
+            height: _selectedProducts.length > 5
+                ? MediaQuery.of(context).size.height * 0.6
+                : null,
+            child: _selectedProducts.isEmpty
+                ? Center(
+              child: Text(
+                "No products selected yet.",
+                style: TextStyle(color: Colors.grey),
+              ),
+            )
+                : ListView.builder(
+              shrinkWrap: true,
+              itemCount: _selectedProducts.length,
+              itemBuilder: (context, index) {
+                final selectedProduct = _selectedProducts[index];
+                return Card(
+                  margin: EdgeInsets.only(bottom: 8.h),
+                  child: Padding(
+                    padding: EdgeInsets.all(12.w),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          selectedProduct["name"] ?? 'N/A',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14.sp,
+                          ),
+                        ),
+                        SizedBox(height: 4.h),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "ID: ${selectedProduct["id"]}",
+                              style: TextStyle(
+                                fontSize: 12.sp,
+                                color: Colors.grey,
+                              ),
+                            ),
+                            Text(
+                              "Price: ${selectedProduct["price"]}",
+                              style: TextStyle(
+                                fontSize: 12.sp,
+                                color: Colors.black87,
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 4.h),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Qty: ${_selectedProductQuantities[index] ?? 1}",
+                              style: TextStyle(
+                                fontSize: 12.sp,
+                                color: Colors.black87,
+                              ),
+                            ),
+                            Text(
+                              "Total: ${(selectedProduct["price"] * (_selectedProductQuantities[index] ?? 1)).toStringAsFixed(2)}",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.red,
+                                fontSize: 12.sp,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Close', style: TextStyle(color: AppColors.primaryColor)),
+            ),
+          ],
         );
       },
     );

@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import 'package:go_router/go_router.dart';
+import '../core/config/app_routes/app_routes.dart';
 import '../core/helpers/toast_message_helper.dart';
 import '../core/models/bank_list_model.dart';
 import '../core/models/category_model.dart';
@@ -117,6 +119,7 @@ class BankListController extends GetxController {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         ToastMessageHelper.showToastMessage("${response.body['msg']}", title: 'Success');
+        context.pushNamed(AppRoutes.salesListScreen);
         return true;
       } else {
         ToastMessageHelper.showToastMessage("Bank Receive failed!");

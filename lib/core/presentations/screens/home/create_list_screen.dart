@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:sbms_apps/core/presentations/widgets/custom_button.dart';
 import 'package:sbms_apps/core/presentations/widgets/custom_loader.dart';
+import 'package:sbms_apps/core/presentations/widgets/searchable_dealer_dropdown.dart';
 
 import '../../../../controllers/bank_create_controller.dart';
 import '../../../../controllers/product_list_controller.dart';
@@ -190,6 +191,20 @@ class _CreateScreenState extends State<CreateScreen> {
                         labelText: "Narration",
                         border: OutlineInputBorder(),
                       ),
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return "Narration cannot be empty";
+                        }
+                        if (value.length > 255) {
+                          return "Narration cannot exceed 255 characters";
+                        }
+                        // Optional: Allow only letters, numbers, basic punctuation
+                        final validPattern = RegExp(r'^[a-zA-Z0-9\s.,!?()-]*$');
+                        if (!validPattern.hasMatch(value)) {
+                          return "Invalid characters in narration";
+                        }
+                        return null; // Valid
+                      },
                     ),
                   ),
                 ],
@@ -292,38 +307,25 @@ class _CreateScreenState extends State<CreateScreen> {
             ),
             SizedBox(height: 10.h),
 
-            /// Dealer Dropdown
+            /// Dealer Searchable Dropdown
+
+
             Obx(() {
               if (productListController.dealerList.value.dealerInfo == null ||
                   productListController.dealerList.value.dealerInfo!.isEmpty) {
-                return DropdownButtonFormField<int>(
+                return TextFormField(
                   decoration: const InputDecoration(
                     labelText: "Dealer",
                     border: OutlineInputBorder(),
+                    hintText: "No dealers available",
                   ),
-                  items: const [],
-                  onChanged: null,
-                  hint: const Text("No dealers available"),
+                  enabled: false,
                 );
               }
 
-              return DropdownButtonFormField<int>(
-                decoration: const InputDecoration(
-                  labelText: "Dealer",
-                  border: OutlineInputBorder(),
-                ),
-                value: rowData.dealerId,
-                items: productListController.dealerList.value.dealerInfo
-                    ?.map((dealer) => DropdownMenuItem<int>(
-                  value: dealer.id,
-                  child: Text(
-                    '${dealer.id} - ${dealer.dealerName ?? 'N/A'}',
-                    style: TextStyle(fontSize: 12.sp),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ))
-                    .toList() ??
-                    [],
+              return SearchableDealerDropdown(
+                dealers: productListController.dealerList.value.dealerInfo,
+                selectedDealerId: rowData.dealerId,
                 onChanged: (val) {
                   setState(() {
                     rowData.dealerId = val;
@@ -336,10 +338,11 @@ class _CreateScreenState extends State<CreateScreen> {
                     // bankListController.getInvoiceList(dealerId: val);
                   }
                 },
-                isExpanded: true,
                 validator: (value) => value == null ? "Select dealer" : null,
               );
             }),
+
+
             SizedBox(height: 12.h),
 
             /// Bank Dropdown
@@ -659,57 +662,5 @@ class _CreateScreenState extends State<CreateScreen> {
     );
   }
 
-  //
-  // void _handleSubmit() {
-  //   // Validation
-  //   if (_selectedDate == null) {
-  //     _showError("Please select a date");
-  //     return;
-  //   }
-  //
-  //   if (!formKey.currentState!.validate()) {
-  //     _showError("Please fill all required fields");
-  //     return;
-  //   }
-  //
-  //   // Prepare data
-  //   String formattedDate =
-  //       "${_selectedDate!.year}-${_selectedDate!.month.toString().padLeft(2, '0')}-${_selectedDate!.day.toString().padLeft(2, '0')}";
-  //
-  //   List<int> dealerIds = _paymentRows.map((row) => row.dealerId ?? 0).toList();
-  //   List<int> bankIds = _paymentRows.map((row) => row.bankId ?? 0).toList();
-  //   List<int> categoryIds = _paymentRows.map((row) => row.categoryId ?? 0).toList();
-  //   List<String> balanceTypes = _paymentRows.map((row) => row.balanceType ?? "Invoice").toList();
-  //   List<String> salesInvoices = _paymentRows.map((row) => row.invoiceValue ?? "").toList();
-  //   List<int> bankCharges =
-  //   _paymentRows.map((row) => int.tryParse(row.bankChargeController.text.trim()) ?? 0).toList();
-  //   List<int> amounts = _paymentRows.map((row) => int.tryParse(row.amountController.text.trim()) ?? 0).toList();
-  //
-  //   // Call API
-  //   bankListController.bankReceiveStore(
-  //     paymentDate: formattedDate,
-  //     dealerId: dealerIds,
-  //     bankId: bankIds,
-  //     categoryId: categoryIds,
-  //     balanceType: balanceTypes,
-  //     salesInvoice: salesInvoices,
-  //     bankCharge: bankCharges,
-  //     amount: amounts,
-  //     paymentDescription: _narrationController.text.trim(),
-  //     context: context,
-  //   );
-  //
-  //   // Debug print
-  //   print("=== Submit Data ===");
-  //   print("Payment Date: $formattedDate");
-  //   print("Dealer IDs: $dealerIds");
-  //   print("Bank IDs: $bankIds");
-  //   print("Category IDs: $categoryIds");
-  //   print("Balance Types: $balanceTypes");
-  //   print("Sales Invoices: $salesInvoices");
-  //   print("Bank Charges: $bankCharges");
-  //   print("Amounts: $amounts");
-  //   print("Description: ${_narrationController.text.trim()}");
-  //   print("==================");
-  // }
+
 }

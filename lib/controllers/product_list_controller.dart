@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import 'package:go_router/go_router.dart';
+import 'package:sbms_apps/core/config/app_routes/app_routes.dart';
 
 import '../core/helpers/toast_message_helper.dart';
 import '../core/models/dealer_info_model.dart';
@@ -78,11 +80,19 @@ class ProductListController extends GetxController {
 
   RxBool productWisePriceLoading = false.obs;
   Rx<ProductWisePricetModel> productWisePrice = Rx<ProductWisePricetModel>(ProductWisePricetModel());
+  
+  // Map to store price information for each product ID
+  final Map<int, ProductWisePricetModel> productPriceMap = {};
+  
+  // Loading state for specific product prices
+  final Map<int, RxBool> productPriceLoadingMap = {};
 
-  Future<void> getProductWisePrice() async {
+  Future<void> getProductWisePrice({int? productId}) async {
     productWisePriceLoading.value = true;
     try {
-      var response = await ApiClient.getData(ApiConstants.getProductWiseEndPoint);
+      // Use the provided product ID, default to 1 if not provided
+      String endpoint = productId != null ? "/api/v2/get-product-wise-price-info/$productId" : ApiConstants.getProductWiseEndPoint;
+      var response = await ApiClient.getData(endpoint);
       if (response.statusCode == 200) {
         productWisePrice.value = ProductWisePricetModel.fromJson(response.body['res']);
       }
@@ -91,6 +101,52 @@ class ProductListController extends GetxController {
     } finally {
       productWisePriceLoading.value = false;
     }
+  }
+  
+  // New method to get product-wise price for a specific product ID
+  Future<ProductWisePricetModel> getProductWisePriceForProduct(int productId) async {
+    // Check if we already have the price in the map
+    if (productPriceMap.containsKey(productId)) {
+      return productPriceMap[productId]!;
+    }
+    
+    // Mark as loading
+    productPriceLoadingMap[productId] ??= false.obs;
+    productPriceLoadingMap[productId]!.value = true;
+    
+    try {
+      String endpoint = "/api/v2/get-product-wise-price-info/$productId";
+      var response = await ApiClient.getData(endpoint);
+      if (response.statusCode == 200) {
+        var priceModel = ProductWisePricetModel.fromJson(response.body['res']);
+        // Cache the price information
+        productPriceMap[productId] = priceModel;
+        return priceModel;
+      }
+    } catch (e) {
+      print('ProductWise Price error for product $productId: $e');
+    } finally {
+      // Mark as not loading
+      if (productPriceLoadingMap.containsKey(productId)) {
+        productPriceLoadingMap[productId]!.value = false;
+      }
+    }
+    return ProductWisePricetModel();
+  }
+  
+  // Method to clear all cached prices
+  void clearProductPriceCache() {
+    productPriceMap.clear();
+    // Clear loading states too
+    productPriceLoadingMap.clear();
+  }
+  
+  // Method to get loading state for a specific product
+  bool isProductPriceLoading(int productId) {
+    if (productPriceLoadingMap.containsKey(productId)) {
+      return productPriceLoadingMap[productId]!.value;
+    }
+    return false;
   }
 
 
@@ -145,7 +201,6 @@ class ProductListController extends GetxController {
       "grand_total_qty": grandTotalQty,
       "garnd_total_payable_amount": grandTotalPayableAmount,
       "narration": narration ?? "",
-      "total_amount": grandTotalPayableAmount,
       "total_amount": totalAmount,
     };
 
@@ -159,6 +214,7 @@ class ProductListController extends GetxController {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         ToastMessageHelper.showToastMessage("${response.body['msg']}",title: 'Success');
+        context.pushNamed(AppRoutes.salesListScreen);
         return true;
       } else {
         ToastMessageHelper.showToastMessage("Order creation failed!");

@@ -6,14 +6,14 @@ ProductWisePricetModel productWisePricetModelFromJson(String str) => ProductWise
 String productWisePricetModelToJson(ProductWisePricetModel data) => json.encode(data.toJson());
 
 class ProductWisePricetModel {
-  final ProductInfo? productInfo;
+  final ProductPriceInfo? productInfo;
 
   ProductWisePricetModel({
     this.productInfo,
   });
 
   factory ProductWisePricetModel.fromJson(Map<String, dynamic> json) => ProductWisePricetModel(
-    productInfo: json["product_info"] == null ? null : ProductInfo.fromJson(json["product_info"]),
+    productInfo: json["product_info"] == null ? null : ProductPriceInfo.fromJson(json["product_info"]),
   );
 
   Map<String, dynamic> toJson() => {
@@ -21,16 +21,16 @@ class ProductWisePricetModel {
   };
 }
 
-class ProductInfo {
+class ProductPriceInfo {
   final int? stock;
   final String? price;
 
-  ProductInfo({
+  ProductPriceInfo({
     this.stock,
     this.price,
   });
 
-  factory ProductInfo.fromJson(Map<String, dynamic> json) => ProductInfo(
+  factory ProductPriceInfo.fromJson(Map<String, dynamic> json) => ProductPriceInfo(
     stock: json["stock"],
     price: json["price"],
   );

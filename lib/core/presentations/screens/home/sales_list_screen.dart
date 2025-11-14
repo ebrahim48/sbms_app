@@ -30,7 +30,7 @@ class _SalesListScreenState extends State<SalesListScreen> {
       appBar: AppBar(
         backgroundColor: AppColors.primaryColor,
         title: const Text(
-          "Order List",
+          "Sales List",
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
