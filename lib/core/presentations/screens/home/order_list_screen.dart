@@ -6,7 +6,6 @@ import '../../../../controllers/product_list_controller.dart';
 import '../../../constants/app_colors.dart';
 import '../../../helpers/toast_message_helper.dart';
 import '../../../models/product_list_model.dart';
-import '../../../models/warehouselist_model.dart';
 import '../../widgets/custom_loader.dart';
 
 class OrderListScreen extends StatefulWidget {
@@ -28,7 +27,6 @@ class _OrderListScreenState extends State<OrderListScreen> {
       productListController.getProductWisePrice();
       productListController.getOrderInvoice();
       productListController.getProductList().then((_) async {
-        // After getting product list, fetch prices for each product
         final products = productListController.productList.value.productInfo ?? [];
         for (var product in products) {
           if (product?.id != null) {
@@ -41,19 +39,15 @@ class _OrderListScreenState extends State<OrderListScreen> {
 
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
-  // State variables for order management
-  List<Map<String, dynamic>> _selectedProducts = []; // Stores products added to the order
-  List<double> _productQuantities = []; // Stores quantities for all available products
-  List<double> _selectedProductQuantities = []; // Stores quantities for selected products only
-  List<bool> _productSelections = [];
-  bool _isProductListVisible = false; // To control visibility of product list
-  String _searchQuery = "";
+
+  List<Map<String, dynamic>> _selectedProducts = [];
+  List<double> _selectedProductQuantities = [];
+  bool _isProductListVisible = false;
   final TextEditingController _searchController = TextEditingController();
   final TextEditingController _narrationController = TextEditingController();
   DateTime? _selectedDate;
   String? _vendorName;
   int? _vendorId;
-  String? _branch;
   int? _warehouseId;
   String? _type;
   final List<String> _types = ["Finished Goods"];
@@ -66,7 +60,9 @@ class _OrderListScreenState extends State<OrderListScreen> {
         backgroundColor: AppColors.primaryColor,
         title: const Text(
           "Order Create",
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
       ),
@@ -77,206 +73,185 @@ class _OrderListScreenState extends State<OrderListScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              /// ========================> Row 1: Date, Vendor, Invoice ===========================>
-              Row(
+
+              /// ========================> All Fields in Column Layout ===========================>
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                    flex: 2,
-                    child: GestureDetector(
-                      onTap: _pickDate,
-                      child: AbsorbPointer(
-                        child: TextFormField(
-                          decoration: InputDecoration(
-                            labelText: "Date",
-                            border: const OutlineInputBorder(),
-                            suffixIcon:
-                            const Icon(Icons.calendar_today, color: AppColors.primaryColor),
+                  /// =============================> Date Field ==========================>
+                  GestureDetector(
+                    onTap: _pickDate,
+                    child: AbsorbPointer(
+                      child: TextFormField(
+                        decoration: InputDecoration(
+                          labelText: "Date",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
                           ),
-                          controller: TextEditingController(
-                            text: _selectedDate == null
-                                ? ''
-                                : "${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}",
-                          ),
+                          filled: true,
+                          fillColor: Colors.white,
+                          suffixIcon: const Icon(Icons.calendar_today, color: AppColors.primaryColor),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+                        ),
+                        controller: TextEditingController(
+                          text: _selectedDate == null
+                              ? ''
+                              : "${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}",
                         ),
                       ),
                     ),
                   ),
-                  SizedBox(width: 10.w),
+                  SizedBox(height: 10.h),
 
 
-
-                  /// =============================> order vendor with search ==========================>
-                  Expanded(
-                    flex: 3,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Custom vendor selection field
-                        Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: ListTile(
-                            leading: Icon(Icons.business, color: AppColors.primaryColor),
-                            title: Text(
-                              _vendorName ?? "Select Vendor",
-                              style: TextStyle(
-                                color: _vendorName != null ? Colors.black : Colors.grey.shade600,
-                              ),
-                            ),
-                            trailing: Icon(Icons.arrow_drop_down),
-                            onTap: () {
-                              _showSearchableDealerDialog();
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
+                    /// =============================> Vendor Field with Search ==========================>
+                    Container(
+                    decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(8),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Color(0x08000000),
+                        offset: Offset(0, 4),
+                        blurRadius: 4,
+                      ),
+                    ],
                   ),
+          child: ListTile(
+            leading: Icon(Icons.business, color: AppColors.primaryColor),
+            title: Text(
+              _vendorName ?? "Select Vendor",
+              style: TextStyle(
+                color: _vendorName != null ? Colors.black : Colors.grey.shade600,
+                fontSize: 16.sp,
+              ),
+            ),
+            trailing: Icon(Icons.arrow_drop_down),
+            onTap: () {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (mounted) {
+                  _showSearchableDealerDialog();
+                }
+              });
+            },
+          ),
+        ),  SizedBox(height: 10.h),
 
-
-
-                  // Obx(()=>
-                  //   Expanded(
-                  //     flex: 3,
-                  //     child: DropdownButtonFormField<String>(
-                  //       decoration: const InputDecoration(
-                  //         labelText: "Vendor Name",
-                  //         border: OutlineInputBorder(),
-                  //       ),
-                  //       value: _vendorName,
-                  //       items: productListController.dealerList.value.dealerInfo
-                  //           ?.map((dealer) => DropdownMenuItem(
-                  //         value: dealer.dealerName,
-                  //         child: Row(
-                  //           children: [
-                  //             Text(
-                  //               '${dealer.id ?? 'N/A'} - ',
-                  //               style: TextStyle(
-                  //                 fontSize: 12.sp,
-                  //                 fontWeight: FontWeight.w500,
-                  //               ),
-                  //             ),
-                  //             Text(
-                  //               dealer.dealerName ?? 'N/A',
-                  //               style: TextStyle(
-                  //                 fontSize: 12.sp,
-                  //                 fontWeight: FontWeight.w500,
-                  //               ),
-                  //             ),
-                  //           ],
-                  //         ),
-                  //       ))
-                  //           .toList() ?? [],
-                  //       onChanged: (val) => setState(() => _vendorName = val),
-                  //       isExpanded: true,
-                  //       menuMaxHeight: 300,
-                  //     ),
-                  //   ),),
-                  SizedBox(width: 10.w),
-
-                  /// =============================>  Invoice ==========================>
-
-                  Obx((){
+                  /// =============================> Invoice Field ==========================>
+                  Obx(() {
                     if (productListController.orderInvoiceNumberLoading.value) {
                       return const Center(child: CustomLoader());
                     }
-                    return Expanded(
+                    return GestureDetector(
+                      onTap: () {
+                        // Show a dialog with invoice information or options
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          if (mounted) {
+                            _showInvoiceInfoDialog();
+                          }
+                        });
+                      },
                       child: Container(
-                          padding:
-                          EdgeInsets.symmetric(horizontal: 8.w, vertical: 12.h),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.redAccent),
-                            borderRadius: BorderRadius.circular(5),
+                        width: double.infinity,
+                        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          border: Border.all(color: Colors.redAccent),
+                          borderRadius: BorderRadius.circular(8),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Color(0x08000000),
+                              offset: Offset(0, 4),
+                              blurRadius: 4,
+                            ),
+                          ],
+                        ),
+                        child: Text(
+                          "Invoice No: ${productListController.invoiceNumber.value.invoiceNo ?? '100068'}",
+                          style: TextStyle(
+                            color: Colors.red,
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.w500,
                           ),
-                          child: Text(
-                            "Invoice No: ${productListController.invoiceNumber.value.invoiceNo ?? 'N/A'}",
-                            style: TextStyle(color: Colors.red),
-                          )
-
+                        ),
                       ),
                     );
-                  }
+                  }),
+                  SizedBox(height: 10.h),
 
+                  /// =============================> Type Field ==========================>
+                  DropdownButtonFormField<String>(
+                    decoration: InputDecoration(
+                      labelText: "Type",
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                      contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+                    ),
+                    value: _type,
+                    items: _types
+                        .map((e) => DropdownMenuItem(
+                      value: e,
+                      child: Text(e),
+                    ))
+                        .toList(),
+                    onChanged: (val) => setState(() => _type = val),
                   ),
+                  SizedBox(height: 10.h),
+
+                  /// =============================> Warehouse Field ==========================>
+                  DropdownButtonFormField<int>(
+                    decoration: InputDecoration(
+                      labelText: 'Warehouse',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                      contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+                    ),
+                    value: _warehouseId,
+                    items: productListController.wareHouseList.value.warehouseInfo
+                        ?.map((warehouse) => DropdownMenuItem(
+                      value: warehouse.id,
+                      child: Row(
+                        children: [
+                          Text(
+                            '${warehouse.id ?? 'N/A'} - ',
+                            style: TextStyle(
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          Text(
+                            warehouse.warehouseName ?? 'N/A',
+                            style: TextStyle(
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ))
+                        .toList() ??
+                        [],
+                    onChanged: (val) => setState(() {
+                      _warehouseId = val;
+                      if (val != null) {
+                        // Add your logic here
+                      }
+                    }),
+                    isExpanded: true,
+                    menuMaxHeight: 300,
+                  ),
+                  SizedBox(height: 16.h),
                 ],
               ),
-              SizedBox(height: 16.h),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    SizedBox(
-                      width: 220.w,
-                      child: DropdownButtonFormField<String>(
-                        decoration: const InputDecoration(
-                          labelText: "Type",
-                          border: OutlineInputBorder(),
-                        ),
-                        value: _type,
-                        items: _types
-                            .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                            .toList(),
-                        onChanged: (val) => setState(() => _type = val),
-                      ),
-                    ),
-                    SizedBox(width: 10.w),
-
-
-                    SizedBox(
-                      width: 220.w,
-                      child: DropdownButtonFormField<int>(
-                        decoration:  InputDecoration(
-                          labelText: 'Warehouse',
-                          border: OutlineInputBorder(),
-                        ),
-                        value: _warehouseId,
-                        items: productListController.wareHouseList.value.warehouseInfo
-                            ?.map((warehouse) => DropdownMenuItem(
-                          value: warehouse.id,
-                          child: Row(
-                            children: [
-                              Text(
-                                '${warehouse.id ?? 'N/A'} - ',
-                                style: TextStyle(
-                                  fontSize: 16.sp,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                              Text(
-                                warehouse.warehouseName ?? 'N/A',
-                                style: TextStyle(
-                                  fontSize: 16.sp,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ))
-                            .toList() ?? [],
-                        onChanged: (val) => setState(() {
-                          _warehouseId = val;
-                          if (val != null) {
-                            _branch = productListController.wareHouseList.value.warehouseInfo
-                                ?.firstWhere((warehouse) => warehouse.id == val, orElse: () =>
-                            productListController.wareHouseList.value.warehouseInfo!.isNotEmpty ?
-                            productListController.wareHouseList.value.warehouseInfo!.first : WarehouseInfo(id: null, warehouseName: null))
-                                ?.warehouseName;
-                          }
-                        }),
-                        isExpanded: true,
-                        menuMaxHeight: 300,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(height: 16.h),
-
               ///======================================> Product Selection Section ==============================>
-              // Section with toggle button and search
+
               Row(
                 children: [
                   Expanded(
@@ -300,7 +275,6 @@ class _OrderListScreenState extends State<OrderListScreen> {
                         enabled: _isProductListVisible, // Disable search when product list is hidden
                         onChanged: (value) {
                           setState(() {
-                            _searchQuery = value.toLowerCase();
                           });
                         },
                       ),
@@ -347,7 +321,12 @@ class _OrderListScreenState extends State<OrderListScreen> {
                     icon: Icon(Icons.add_circle, color: AppColors.primaryColor),
                     tooltip: "View Selected Products",
                     onPressed: () {
-                      _showSelectedProductsPopup();
+                      // Use WidgetsBinding to ensure dialog shows after frame rendering
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        if (mounted) {
+                          _showSelectedProductsPopup();
+                        }
+                      });
                     },
                   ),
                 ],
@@ -663,52 +642,6 @@ class _OrderListScreenState extends State<OrderListScreen> {
                         }
                       }
 
-                    // onpress: () {
-                    //   if (formKey.currentState!.validate()) {
-                    //     final productList = _products;
-                    //
-                    //     final productIds = productList.map((p) => p["id"] as int).toList();
-                    //     final prices = productList.map((p) => (p["price"] as num).toInt()).toList();
-                    //     final quantities = productList.map((p) => (p["qty"] as num).toInt()).toList();
-                    //     final totals = productList
-                    //         .map((p) => ((p["price"] as num) * (p["qty"] as num)).toInt())
-                    //         .toList();
-                    //
-                    //     // 🧮 Step 2: Calculate grand totals
-                    //     final grandTotalQty = quantities.fold(0, (sum, qty) => sum + qty);
-                    //     final grandTotalPayableAmount = totals.fold(0, (sum, t) => sum + t);
-                    //
-                    //     // 🗓️ Step 3: Validation check
-                    //     if (_selectedDate == null) {
-                    //       ToastMessageHelper.showToastMessage("Please select a date before confirming.");
-                    //       return;
-                    //     }
-                    //
-                    //     final formattedDate =
-                    //         "${_selectedDate!.year}-${_selectedDate!.month.toString().padLeft(2, '0')}-${_selectedDate!.day.toString().padLeft(2, '0')}";
-                    //
-                    //
-                    //     productListController.orderCreateInfo(
-                    //       date: formattedDate,
-                    //       dealerId: productListController.dealerList.value.dealerInfo
-                    //           ?.firstWhereOrNull((dealer) => dealer.dealerName == _vendorName)
-                    //           ?.id ?? 0,
-                    //       invoiceNo: productListController.invoiceNumber.value.invoiceNo?.toString() ?? 'N/A',
-                    //       warehouseId: productListController.wareHouseList.value.warehouseInfo
-                    //           ?.firstWhereOrNull((w) => w.warehouseName == _branch)
-                    //           ?.id ?? 0,
-                    //       productId: productIds,
-                    //       price: prices,
-                    //       quantity: quantities,
-                    //       totalPrice: totals,
-                    //       grandTotalQty: grandTotalQty,
-                    //       grandTotalPayableAmount: grandTotalPayableAmount,
-                    //       narration: _narrationController.text.trim(),
-                    //       context: context,
-                    //       totalAmount: totals,
-                    //     );
-                    //   }
-                    // },
                   ),)
             ],
           ),
@@ -717,8 +650,11 @@ class _OrderListScreenState extends State<OrderListScreen> {
     );
   }
 
-  // Show a dialog with searchable product list
+
   Future<void> _showSearchableProductDialog() async {
+    // Check if the widget is still mounted before showing the dialog
+    if (!mounted) return;
+
     final products = (productListController.productList.value.productInfo ?? []);
     List<dynamic> filteredProducts = List.from(products);
     String searchQuery = '';
@@ -771,8 +707,12 @@ class _OrderListScreenState extends State<OrderListScreen> {
                       ),
                       subtitle: Text('ID: ${product?.id ?? 'N/A'}'),
                       onTap: () {
-                        _showProductDetailsDialog(product);
+                        // Close the search dialog first, then show the product details dialog
                         Navigator.of(context).pop();
+                        // Use WidgetsBinding to ensure proper timing between closing one dialog and opening another
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          _showProductDetailsDialog(product);
+                        });
                       },
                     );
                   },
@@ -805,7 +745,12 @@ class _OrderListScreenState extends State<OrderListScreen> {
       ),
       child: TextButton(
         onPressed: () {
-          _showSearchableProductDialog();
+          // Use WidgetsBinding to ensure dialog shows after frame rendering
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) {
+              _showSearchableProductDialog();
+            }
+          });
         },
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -827,16 +772,16 @@ class _OrderListScreenState extends State<OrderListScreen> {
     );
   }
 
-  // Show product details in a dialog when selected from dropdown
+
   Future<void> _showProductDetailsDialog(ProductInfo product) async {
-    // Get price and stock info for the selected product
+    // Check if the widget is still mounted before showing the dialog
+    if (!mounted) return;
+
     var priceInfo = productListController.productPriceMap[product.id!];
     if (priceInfo == null) {
-      // If not in cache, fetch it
       priceInfo = await productListController.getProductWisePriceForProduct(product.id!);
     }
 
-    // Initialize quantity for this product as empty
     String currentQuantity = '';
 
     await showDialog(
@@ -852,47 +797,49 @@ class _OrderListScreenState extends State<OrderListScreen> {
                   color: AppColors.primaryColor,
                 ),
               ),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Product ID: ${product.id}",
-                    style: TextStyle(fontSize: 14.sp),
-                  ),
-                  SizedBox(height: 8.h),
-                  Text(
-                    "Price: ৳${priceInfo?.productInfo?.price ?? 'N/A'}",
-                    style: TextStyle(fontSize: 14.sp, color: Colors.green),
-                  ),
-                  SizedBox(height: 8.h),
-                  Text(
-                    "Stock: ${priceInfo?.productInfo?.stock ?? 'N/A'}",
-                    style: TextStyle(fontSize: 14.sp, color: Colors.red),
-                  ),
-                  SizedBox(height: 16.h),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextFormField(
-                          initialValue: currentQuantity,
-                          decoration: InputDecoration(
-                            labelText: "Quantity",
-                            hintText: "Enter quantity",
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(6.r),
+              content: SingleChildScrollView(  // Make sure content is scrollable if needed
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Product ID: ${product.id}",
+                      style: TextStyle(fontSize: 14.sp),
+                    ),
+                    SizedBox(height: 8.h),
+                    Text(
+                      "Price: ৳${priceInfo?.productInfo?.price ?? 'N/A'}",
+                      style: TextStyle(fontSize: 14.sp, color: Colors.green),
+                    ),
+                    SizedBox(height: 8.h),
+                    Text(
+                      "Stock: ${priceInfo?.productInfo?.stock ?? 'N/A'}",
+                      style: TextStyle(fontSize: 14.sp, color: Colors.red),
+                    ),
+                    SizedBox(height: 16.h),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextFormField(
+                            initialValue: currentQuantity,
+                            decoration: InputDecoration(
+                              labelText: "Quantity",
+                              hintText: "Enter quantity",
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(6.r),
+                              ),
                             ),
+                            keyboardType: TextInputType.number,
+                            onChanged: (value) {
+                              // Update the quantity
+                              currentQuantity = value;
+                            },
                           ),
-                          keyboardType: TextInputType.number,
-                          onChanged: (value) {
-                            // Update the quantity
-                            currentQuantity = value;
-                          },
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                      ],
+                    ),
+                  ],
+                ),
               ),
               actions: [
                 TextButton(
@@ -978,17 +925,21 @@ class _OrderListScreenState extends State<OrderListScreen> {
     }
   }
 
+
   // Show a dialog with searchable dealer list
   Future<void> _showSearchableDealerDialog() async {
+    // Check if the widget is still mounted before showing the dialog
+    if (!mounted) return;
+
     final dealers = (productListController.dealerList.value.dealerInfo ?? []);
     List<dynamic> filteredDealers = List.from(dealers);
     String searchQuery = '';
 
     await showDialog(
       context: context,
-      builder: (BuildContext context) {
+      builder: (BuildContext dialogContext) {  // ✅ Renamed context to dialogContext
         return StatefulBuilder(
-          builder: (BuildContext context, StateSetter setState) {
+          builder: (BuildContext context, StateSetter setDialogState) {  // ✅ This is for dialog state only
             return AlertDialog(
               title: Column(
                 children: [
@@ -1001,7 +952,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
                       ),
                     ),
                     onChanged: (value) {
-                      setState(() {
+                      setDialogState(() {  // ✅ Update only dialog state for filtering
                         searchQuery = value.toLowerCase();
                         filteredDealers = dealers.where((dealer) {
                           final name = (dealer.dealerName ?? '').toLowerCase();
@@ -1017,6 +968,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
               ),
               content: Container(
                 width: double.maxFinite,
+                height: 400,
                 child: ListView.builder(
                   shrinkWrap: true,
                   itemCount: filteredDealers.length,
@@ -1031,11 +983,15 @@ class _OrderListScreenState extends State<OrderListScreen> {
                       ),
                       subtitle: Text('ID: ${dealer.id ?? 'N/A'}'),
                       onTap: () {
+                        // ✅ Close dialog first
+                        Navigator.of(dialogContext).pop();
+
+                        // ✅ Update parent widget state AFTER dialog closes
+                        // Use the main widget's setState (not the dialog's)
                         setState(() {
                           _vendorId = dealer.id;
                           _vendorName = dealer.dealerName;
                         });
-                        Navigator.of(context).pop();
                       },
                     );
                   },
@@ -1044,7 +1000,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
               actions: [
                 TextButton(
                   onPressed: () {
-                    Navigator.of(context).pop();
+                    Navigator.of(dialogContext).pop();
                   },
                   child: Text('Cancel', style: TextStyle(color: Colors.red)),
                 ),
@@ -1056,8 +1012,107 @@ class _OrderListScreenState extends State<OrderListScreen> {
     );
   }
 
+
+
+  // // Show a dialog with searchable dealer list
+  // Future<void> _showSearchableDealerDialog() async {
+  //   // Check if the widget is still mounted before showing the dialog
+  //   if (!mounted) return;
+  //
+  //   final dealers = (productListController.dealerList.value.dealerInfo ?? []);
+  //   List<dynamic> filteredDealers = List.from(dealers);
+  //   String searchQuery = '';
+  //
+  //   await showDialog(
+  //     context: context,
+  //     builder: (BuildContext context) {
+  //       return StatefulBuilder(
+  //         builder: (BuildContext context, StateSetter setState) {
+  //           return AlertDialog(
+  //             title: Column(
+  //               children: [
+  //                 TextField(
+  //                   decoration: InputDecoration(
+  //                     hintText: "Search vendors...",
+  //                     prefixIcon: Icon(Icons.search, color: AppColors.primaryColor),
+  //                     border: OutlineInputBorder(
+  //                       borderRadius: BorderRadius.circular(8),
+  //                     ),
+  //                   ),
+  //                   onChanged: (value) {
+  //                     setState(() {
+  //                       searchQuery = value.toLowerCase();
+  //                       filteredDealers = dealers.where((dealer) {
+  //                         final name = (dealer.dealerName ?? '').toLowerCase();
+  //                         final id = (dealer.id?.toString() ?? '').toLowerCase();
+  //                         return name.contains(searchQuery) || id.contains(searchQuery);
+  //                       }).toList();
+  //                     });
+  //                   },
+  //                 ),
+  //                 SizedBox(height: 10),
+  //                 Divider(),
+  //               ],
+  //             ),
+  //             content: Container(
+  //               width: double.maxFinite,
+  //               height: 400, // Add fixed height to prevent overflow
+  //               child: ListView.builder(
+  //                 shrinkWrap: true,
+  //                 itemCount: filteredDealers.length,
+  //                 itemBuilder: (BuildContext context, int index) {
+  //                   final dealer = filteredDealers[index];
+  //                   return ListTile(
+  //                     title: Text(
+  //                       dealer.dealerName ?? 'N/A',
+  //                       style: TextStyle(
+  //                         fontWeight: FontWeight.w500,
+  //                       ),
+  //                     ),
+  //                     subtitle: Text('ID: ${dealer.id ?? 'N/A'}'),
+  //                     onTap: () {
+  //                       // Capture the selected values
+  //                       final selectedDealerId = dealer.id;
+  //                       final selectedDealerName = dealer.dealerName;
+  //
+  //                       // Close the dialog first
+  //                       Navigator.of(context).pop();
+  //
+  //                       // Use the main context of the widget to update the state
+  //                       // This ensures we're updating the correct widget's state
+  //                       WidgetsBinding.instance.addPostFrameCallback((_) {
+  //                         if (mounted) {
+  //                           setState(() {
+  //                             _vendorId = selectedDealerId;
+  //                             _vendorName = selectedDealerName;
+  //                           });
+  //                         }
+  //                       });
+  //                     },
+  //                   );
+  //                 },
+  //               ),
+  //             ),
+  //             actions: [
+  //               TextButton(
+  //                 onPressed: () {
+  //                   Navigator.of(context).pop();
+  //                 },
+  //                 child: Text('Cancel', style: TextStyle(color: Colors.red)),
+  //               ),
+  //             ],
+  //           );
+  //         },
+  //       );
+  //     },
+  //   );
+  // }
+
   // Show a dialog with selected products
   Future<void> _showSelectedProductsPopup() async {
+    // Check if the widget is still mounted before showing the dialog
+    if (!mounted) return;
+
     await showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -1174,4 +1229,45 @@ class _OrderListScreenState extends State<OrderListScreen> {
     );
   }
 
+  // Show invoice information dialog
+  Future<void> _showInvoiceInfoDialog() async {
+    // Check if widget is still mounted
+    if (!mounted) return;
+
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Invoice Information"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Current Invoice No: ${productListController.invoiceNumber.value.invoiceNo ?? 'N/A'}",
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 10),
+              const Text(
+                "This invoice number is auto-generated for your new order. "
+                "It will be unique and sequential.",
+                style: TextStyle(fontSize: 14),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text("OK"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
 }
+
+

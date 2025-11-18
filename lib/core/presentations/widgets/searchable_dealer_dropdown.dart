@@ -23,6 +23,7 @@ class SearchableDealerDropdown extends StatefulWidget {
 
 class _SearchableDealerDropdownState extends State<SearchableDealerDropdown> {
   final TextEditingController _searchController = TextEditingController();
+  TextEditingController? _displayController;
   List<DealerInfo> _allDealers = [];
   String _selectedText = "";
 
@@ -37,6 +38,9 @@ class _SearchableDealerDropdownState extends State<SearchableDealerDropdown> {
           .firstWhere((dealer) => dealer.id == widget.selectedDealerId, orElse: () => DealerInfo());
       _selectedText = selectedDealer.dealerName ?? '';
     }
+
+    // Initialize the display controller with the initial selected text
+    _displayController = TextEditingController(text: _selectedText);
   }
 
   @override
@@ -46,11 +50,32 @@ class _SearchableDealerDropdownState extends State<SearchableDealerDropdown> {
     if (oldWidget.dealers != widget.dealers) {
       _allDealers = widget.dealers?.toList() ?? [];
     }
+
+    // Update selected text if selectedDealerId changes from parent
+    if (oldWidget.selectedDealerId != widget.selectedDealerId) {
+      if (widget.selectedDealerId != null && widget.dealers != null) {
+        final selectedDealer = widget.dealers!
+            .firstWhere((dealer) => dealer.id == widget.selectedDealerId, orElse: () => DealerInfo());
+        final newSelectedText = selectedDealer.dealerName ?? '';
+        _selectedText = newSelectedText;
+
+        // Also update the display controller to reflect the change immediately
+        if (_displayController != null) {
+          _displayController!.text = newSelectedText;
+        }
+      } else {
+        _selectedText = '';
+        if (_displayController != null) {
+          _displayController!.text = '';
+        }
+      }
+    }
   }
 
   @override
   void dispose() {
     _searchController.dispose();
+    _displayController?.dispose();
     super.dispose();
   }
 
@@ -75,8 +100,14 @@ class _SearchableDealerDropdownState extends State<SearchableDealerDropdown> {
       }
     }
 
+    // Check if the widget is still mounted before showing the dialog
+    if (!mounted) return;
+
+    // Get the correct context for showing dialogs
+    final BuildContext dialogContext = context;
+
     final result = await showDialog<int>(
-      context: context,
+      context: dialogContext,
       builder: (BuildContext context) {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
@@ -84,6 +115,7 @@ class _SearchableDealerDropdownState extends State<SearchableDealerDropdown> {
               title: const Text("Select Dealer"),
               content: SizedBox(
                 width: double.maxFinite,
+                height: 400, // Fixed height to avoid overflow issues
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -137,7 +169,8 @@ class _SearchableDealerDropdownState extends State<SearchableDealerDropdown> {
       },
     );
 
-    if (result != null) {
+    // Check if the widget is still mounted after the dialog is closed
+    if (mounted && result != null) {
       widget.onChanged?.call(result);
 
       // Update selected text
@@ -145,29 +178,64 @@ class _SearchableDealerDropdownState extends State<SearchableDealerDropdown> {
             (dealer) => dealer.id == result,
             orElse: () => DealerInfo(),
           );
+      final newSelectedText = selectedDealer?.dealerName ?? '';
+
       setState(() {
-        _selectedText = selectedDealer?.dealerName ?? '';
+        _selectedText = newSelectedText;
       });
+
+      // Also update the display controller directly to ensure the text updates immediately
+      if (_displayController != null) {
+        _displayController!.text = newSelectedText;
+      }
     }
+
+    // Dispose the local search controller after the dialog is closed
+    searchController.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    // Ensure the display controller has the correct text value
+    if (_displayController != null && _displayController!.text != _selectedText) {
+      _displayController!.text = _selectedText;
+    }
+
     return TextFormField(
-      controller: TextEditingController(text: _selectedText.isEmpty ? '' : _selectedText),
+      controller: _displayController!,
       decoration: InputDecoration(
         labelText: widget.labelText,
         border: const OutlineInputBorder(),
         suffixIcon: IconButton(
           icon: const Icon(Icons.arrow_drop_down),
-          onPressed: _openSearchDialog,
+          onPressed: () {
+            // Add a check to ensure the widget is still mounted
+            if (mounted) {
+              // Use WidgetsBinding to ensure dialog shows after frame rendering
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (mounted) {
+                  _openSearchDialog();
+                }
+              });
+            }
+          },
         ),
       ),
       readOnly: true, // Make it read-only since we'll handle selection via the dialog
       validator: widget.validator != null
           ? (value) => widget.validator!(widget.selectedDealerId)
           : null,
-      onTap: _openSearchDialog,
+      onTap: () {
+        // Add a check to ensure the widget is still mounted
+        if (mounted) {
+          // Use WidgetsBinding to ensure dialog shows after frame rendering
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) {
+              _openSearchDialog();
+            }
+          });
+        }
+      },
     );
   }
 }

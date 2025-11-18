@@ -119,7 +119,7 @@ class BankListController extends GetxController {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         ToastMessageHelper.showToastMessage("${response.body['msg']}", title: 'Success');
-        context.pushNamed(AppRoutes.salesListScreen);
+        context.pushNamed(AppRoutes.bankReceiveListScreen);
         return true;
       } else {
         ToastMessageHelper.showToastMessage("Bank Receive failed!");

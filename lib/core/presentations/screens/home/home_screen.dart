@@ -78,6 +78,7 @@ class HomeScreen extends StatelessWidget {
 
                   },
                 ),
+
                 _buildMenuButton(
                   icon: Icons.receipt_long,
                   title: "Order List",
@@ -85,6 +86,21 @@ class HomeScreen extends StatelessWidget {
                     context.pushNamed(AppRoutes.orderListScreen);
                   },
                 ),
+              ],
+            ),
+            SizedBox(height: 20.h),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _buildMenuButton(
+                  icon: Icons.comment_bank_outlined,
+                  title: "Bank",
+                  onTap: () {
+                    context.pushNamed(AppRoutes.bankReceiveListScreen);
+                  },
+                ),
+                SizedBox(width: 20.w),
                 _buildMenuButton(
                   icon: Icons.food_bank_outlined,
                   title: "Bank Create",
@@ -93,7 +109,9 @@ class HomeScreen extends StatelessWidget {
                   },
                 ),
               ],
-            ),
+            )
+
+
           ],
         ),
       ),
@@ -163,6 +181,7 @@ class HomeScreen extends StatelessWidget {
             text: "Logout",
             onTap: () {},
           ),
+
         ],
       ),
     );

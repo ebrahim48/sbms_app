@@ -21,6 +21,7 @@ class ApiConstants{
   static const String getBankListEndPoint = "/api/v2/get-bank-list";
   static const String getCategoryListEndPoint = "/api/v2/get-product-category-list";
   static const String getDealerInvoiceListEndPoint = "/api/v2/get-dealer-wise-invoice-list/52";
+  static const String getBankReceiveListEndPoint = "/api/v2/bank-receive-list";
 
 
 }
