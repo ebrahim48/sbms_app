@@ -9,6 +9,7 @@ import 'package:sbms_apps/core/presentations/screens/home/product_list_screen.da
 import '../../presentations/screens/auth/signin/sign_in _screen.dart';
 import '../../presentations/screens/home/bank_receivelist_screen.dart';
 import '../../presentations/screens/home/sales_list_screen.dart';
+import '../../presentations/screens/main_bottom_nav_screen.dart';
 import '../../presentations/screens/onboarding/onboarding_screen.dart';
 import '../../presentations/screens/onboarding/onboarding_start_screen.dart';
 import '../../presentations/screens/profile/view_profile_screen.dart';

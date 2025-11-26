@@ -2,13 +2,58 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sbms_apps/core/config/app_routes/app_routes.dart';
+import 'package:sbms_apps/core/presentations/screens/home/sales_list_screen.dart';
 
 import '../../../../global/custom_assets/assets.gen.dart';
 import '../../../constants/app_colors.dart';
+import '../profile/view_profile_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  int _currentIndex = 0;
+
+  final List<Widget> _screens = [
+    _HomeContent(),
+    const SalesListScreen(),
+    ViewProfileScreen(),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: _screens[_currentIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        selectedItemColor: AppColors.primaryColor,
+        unselectedItemColor: Colors.grey,
+        currentIndex: _currentIndex,
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+        type: BottomNavigationBarType.fixed,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.list_alt),
+              label: 'Sales List'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.person),
+              label: 'Profile'),
+        ],
+      ),
+    );
+  }
+}
+
+// Extract the original home content to a separate widget
+class _HomeContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,23 +72,6 @@ class HomeScreen extends StatelessWidget {
             onPressed: () => Scaffold.of(context).openDrawer(),
           ),
         ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        selectedItemColor: AppColors.primaryColor,
-        unselectedItemColor: Colors.grey,
-        currentIndex: 0,
-        onTap: (index) {
-
-        },
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.list_alt),
-              label: 'Sales List'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.person),
-              label: 'Profile'),
-        ],
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
@@ -163,7 +191,9 @@ class HomeScreen extends StatelessWidget {
           _buildDrawerItem(
             icon: Icons.support_agent,
             text: "Support",
-            onTap: () {},
+            onTap: () {
+
+            },
           ),
           _buildDrawerItem(
             icon: Icons.policy,
