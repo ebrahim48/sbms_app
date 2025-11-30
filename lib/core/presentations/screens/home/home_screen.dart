@@ -2,16 +2,64 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sbms_apps/core/config/app_routes/app_routes.dart';
+import 'package:sbms_apps/core/presentations/screens/home/sales_list_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+import '../../../../global/custom_assets/assets.gen.dart';
+import '../../../constants/app_colors.dart';
+import '../profile/view_profile_screen.dart';
+
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  int _currentIndex = 0;
+
+  final List<Widget> _screens = [
+    _HomeContent(),
+    const SalesListScreen(),
+    ViewProfileScreen(),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: _screens[_currentIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        selectedItemColor: AppColors.primaryColor,
+        unselectedItemColor: Colors.grey,
+        currentIndex: _currentIndex,
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+        type: BottomNavigationBarType.fixed,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.list_alt),
+              label: 'Sales List'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.person),
+              label: 'Profile'),
+        ],
+      ),
+    );
+  }
+}
+
+// Extract the original home content to a separate widget
+class _HomeContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: _buildAppDrawer(context),
       appBar: AppBar(
-        backgroundColor: Colors.green[700],
+        backgroundColor: AppColors.primaryColor,
         title: const Text(
           "SBMS APPS",
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
@@ -24,19 +72,6 @@ class HomeScreen extends StatelessWidget {
             onPressed: () => Scaffold.of(context).openDrawer(),
           ),
         ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        selectedItemColor: Colors.green[700],
-        unselectedItemColor: Colors.grey,
-        currentIndex: 0,
-        onTap: (index) {
-
-        },
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.list_alt), label: 'Sales List'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
-        ],
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
@@ -67,10 +102,11 @@ class HomeScreen extends StatelessWidget {
                   icon: Icons.add_shopping_cart,
                   title: "Sales",
                   onTap: () {
-                    context.pushNamed(AppRoutes.viewProfileScreen);
+                    context.pushNamed(AppRoutes.salesListScreen);
 
                   },
                 ),
+
                 _buildMenuButton(
                   icon: Icons.receipt_long,
                   title: "Order List",
@@ -80,6 +116,30 @@ class HomeScreen extends StatelessWidget {
                 ),
               ],
             ),
+            SizedBox(height: 20.h),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _buildMenuButton(
+                  icon: Icons.comment_bank_outlined,
+                  title: "Bank",
+                  onTap: () {
+                    context.pushNamed(AppRoutes.bankReceiveListScreen);
+                  },
+                ),
+                SizedBox(width: 20.w),
+                _buildMenuButton(
+                  icon: Icons.food_bank_outlined,
+                  title: "Bank Create",
+                  onTap: () {
+                    context.pushNamed(AppRoutes.createScreen);
+                  },
+                ),
+              ],
+            )
+
+
           ],
         ),
       ),
@@ -93,7 +153,7 @@ class HomeScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           DrawerHeader(
-            decoration: BoxDecoration(color: Colors.green[700]),
+            decoration: BoxDecoration(color: AppColors.primaryColor),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -103,9 +163,9 @@ class HomeScreen extends StatelessWidget {
                   backgroundColor: Colors.white,
                   child: Padding(
                     padding: EdgeInsets.all(6.r),
-                    child: Image.asset(
-                      'assets/images/sbms_logo.png', // <-- Add your logo image here
-                      fit: BoxFit.contain,
+                    child:  Assets.images.logo.image(
+                      width: 32.w,
+                      height: 32.h,
                     ),
                   ),
                 ),
@@ -131,7 +191,9 @@ class HomeScreen extends StatelessWidget {
           _buildDrawerItem(
             icon: Icons.support_agent,
             text: "Support",
-            onTap: () {},
+            onTap: () {
+
+            },
           ),
           _buildDrawerItem(
             icon: Icons.policy,
@@ -149,6 +211,7 @@ class HomeScreen extends StatelessWidget {
             text: "Logout",
             onTap: () {},
           ),
+
         ],
       ),
     );
@@ -161,7 +224,7 @@ class HomeScreen extends StatelessWidget {
     required VoidCallback onTap,
   }) {
     return ListTile(
-      leading: Icon(icon, color: Colors.green[700]),
+      leading: Icon(icon, color: AppColors.primaryColor),
       title: Text(
         text,
         style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w500),
@@ -176,7 +239,7 @@ class HomeScreen extends StatelessWidget {
       width: 160.w,
       padding: EdgeInsets.symmetric(vertical: 20.h, horizontal: 10.w),
       decoration: BoxDecoration(
-        color: Colors.green[700],
+        color: AppColors.primaryColor,
         borderRadius: BorderRadius.circular(12.r),
       ),
       child: Column(
@@ -213,10 +276,10 @@ class HomeScreen extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(12.r),
       child: Container(
-        width: 90.w,
+        width: 80.w,
         padding: EdgeInsets.symmetric(vertical: 16.h),
         decoration: BoxDecoration(
-          color: Colors.green[600],
+          color: AppColors.primaryColor,
           borderRadius: BorderRadius.circular(12.r),
           boxShadow: [
             BoxShadow(

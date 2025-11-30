@@ -1,39 +1,27 @@
 class ApiConstants{
 
-  static const String baseUrl = "https://jakuan8080.syedbipul.me/api/v1";
-  static const String imageBaseUrl = "https://jakuan8080.syedbipul.me";
+  static const String baseUrl = "https://nccl.scanitbd.com";
+  static const String imageBaseUrl = "https://nccl.scanitbd.com";
 
 
 
 
-
-
-
-  static const String signUpEndPoint = "/auth/register";
   static const String loginUpEndPoint = "/auth/login";
-  static const String changePassword = "/auth/change-password";
-  static const String verifyEmailEndPoint = "/auth/verify-email";
-  static const String forgotPasswordEndPoint = "/auth/forgot-password";
-  static const String resetPasswordEndPoint = "/auth/reset-password";
-  static const String resendOtpEndPoint = "/auth/resend-otp";
 
 
-  static const String getAllTagsEndPoint = "/tag/tags";
-  static String updateTagEndPoint(String id) => "/tag/tags/$id";
-  static const String uploadEndPoint = "/story/story";
-  static const String getLatestFormEndPoint = "/story/story";
-  static const String getWorkingDaysEndPoint = "/story/working-days";
-  static const String getStoryStepsEndPoint = "/story/story-steps";
-  static String getStorySingleEndPoint(String id) => "/story/story/$id";
-  static  String getMyStoryEndPoint(String page) =>  "/story/stories?page=$page";
-  static  String getStoryLibraryEndPoint = "/story/libraryData";
-  static  String bookMarkEndPoint = "/story/bookmark";
-  static  String userProfileEndPoint = "/user/profile";
-  static  String userUpdateProfileEndPoint = "/user/profile";
-  static  String deleteProfileEndPoint = "/user/profile";
-  static  String feedbackEndPoint = "/feedback/feedbacks";
-  static  String privacyEndPoint = "/setting/privacy-policy";
-  static  String aboutEndPoint = "/setting/about-us";
-  static  String termsEndPoint = "/setting/terms-conditions";
+
+  static const String getProductListEndPoint = "/api/v2/get-product-list";
+  static const String getDealerListEndPoint = "/api/v2/get-dealer-list";
+  static const String getWareHouseListEndPoint = "/api/v2/get-warehouse-list";
+  static const String getProductWiseEndPoint = "/api/v2/get-product-wise-price-info/1";
+  static const String getInvoiceNumberEndPoint = "/api/v2/get-sales-order-invoice-no";
+  static const String orderCreateEndPoint = "/api/v2/order-store";
+  static const String bankReceiveEndPoint = "/api/v2/payment-receive-store";
+  static const String getSalesOrderListEndPoint = "/api/v2/sales-order-list";
+  static const String getBankListEndPoint = "/api/v2/get-bank-list";
+  static const String getCategoryListEndPoint = "/api/v2/get-product-category-list";
+  static const String getDealerInvoiceListEndPoint = "/api/v2/get-dealer-wise-invoice-list/52";
+  static const String getBankReceiveListEndPoint = "/api/v2/bank-receive-list";
+
 
 }

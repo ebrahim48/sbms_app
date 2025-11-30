@@ -24,12 +24,15 @@ class $AssetsIconsGen {
   /// File path: assets/icons/email.svg
   SvgGenImage get email => const SvgGenImage('assets/icons/email.svg');
 
+  /// File path: assets/icons/logo.svg
+  SvgGenImage get logo => const SvgGenImage('assets/icons/logo.svg');
+
   /// File path: assets/icons/profileview.svg
   SvgGenImage get profileview =>
       const SvgGenImage('assets/icons/profileview.svg');
 
   /// List of all assets
-  List<SvgGenImage> get values => [edit, email, profileview];
+  List<SvgGenImage> get values => [edit, email, logo, profileview];
 }
 
 class $AssetsImagesGen {
@@ -50,6 +53,9 @@ class $AssetsImagesGen {
 
   /// File path: assets/images/limit.png
   AssetGenImage get limit => const AssetGenImage('assets/images/limit.png');
+
+  /// File path: assets/images/logo.png
+  AssetGenImage get logo => const AssetGenImage('assets/images/logo.png');
 
   /// File path: assets/images/onboarding.png
   AssetGenImage get onboarding =>
@@ -89,6 +95,7 @@ class $AssetsImagesGen {
     camera,
     instagram,
     limit,
+    logo,
     onboarding,
     policy,
     privacy,
