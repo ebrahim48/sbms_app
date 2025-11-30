@@ -185,8 +185,9 @@ class ProductListController extends GetxController {
     required List<int> totalPrice,
     required int grandTotalQty,
     required int grandTotalPayableAmount,
-    required List<int> totalAmount,
     String? narration,
+    required List<int> discount,
+    required List<int> bonus,
     required BuildContext context,
   }) async {
     var body = {
@@ -201,7 +202,8 @@ class ProductListController extends GetxController {
       "grand_total_qty": grandTotalQty,
       "garnd_total_payable_amount": grandTotalPayableAmount,
       "narration": narration ?? "",
-      "total_amount": totalAmount,
+      "discount": discount,
+      "bonus": bonus,
     };
 
     orderLoading(true);

@@ -42,6 +42,8 @@ class _OrderListScreenState extends State<OrderListScreen> {
 
   List<Map<String, dynamic>> _selectedProducts = [];
   List<double> _selectedProductQuantities = [];
+  List<int> _selectedProductDiscounts = [];
+  List<int> _selectedProductBonuses = [];
   bool _isProductListVisible = false;
   final TextEditingController _searchController = TextEditingController();
   final TextEditingController _narrationController = TextEditingController();
@@ -51,6 +53,8 @@ class _OrderListScreenState extends State<OrderListScreen> {
   int? _warehouseId;
   String? _type;
   final List<String> _types = ["Finished Goods"];
+  String? _dealerType;
+  final List<String> _dealerTypes = ["Cash Dealer", "Credit Dealer"];
 
 
   @override
@@ -199,6 +203,28 @@ class _OrderListScreenState extends State<OrderListScreen> {
                     ))
                         .toList(),
                     onChanged: (val) => setState(() => _type = val),
+                  ),
+                  SizedBox(height: 10.h),
+
+                  /// =============================> Dealer Type Field ==========================>
+                  DropdownButtonFormField<String>(
+                    decoration: InputDecoration(
+                      labelText: "Dealer Type",
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                      contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+                    ),
+                    value: _dealerType,
+                    items: _dealerTypes
+                        .map((e) => DropdownMenuItem(
+                      value: e,
+                      child: Text(e),
+                    ))
+                        .toList(),
+                    onChanged: (val) => setState(() => _dealerType = val),
                   ),
                   SizedBox(height: 10.h),
 
@@ -428,6 +454,42 @@ class _OrderListScreenState extends State<OrderListScreen> {
                           ),
                           SizedBox(width: 8.w),
                           Expanded(
+                            child: TextFormField(
+                              initialValue: _selectedProductDiscounts[index]?.toString() ?? "0",
+                              decoration: const InputDecoration(
+                                labelText: "Disc %",
+                                border: OutlineInputBorder(),
+                              ),
+                              keyboardType: TextInputType.number,
+                              onChanged: (val) {
+                                setState(() {
+                                  _selectedProductDiscounts[index] = int.tryParse(val) ?? 0;
+                                  // Update the discount in the selected product
+                                  _selectedProducts[index]["discount"] = _selectedProductDiscounts[index];
+                                });
+                              },
+                            ),
+                          ),
+                          SizedBox(width: 8.w),
+                          Expanded(
+                            child: TextFormField(
+                              initialValue: _selectedProductBonuses[index]?.toString() ?? "0",
+                              decoration: const InputDecoration(
+                                labelText: "Bonus %",
+                                border: OutlineInputBorder(),
+                              ),
+                              keyboardType: TextInputType.number,
+                              onChanged: (val) {
+                                setState(() {
+                                  _selectedProductBonuses[index] = int.tryParse(val) ?? 0;
+                                  // Update the bonus in the selected product
+                                  _selectedProducts[index]["bonus"] = _selectedProductBonuses[index];
+                                });
+                              },
+                            ),
+                          ),
+                          SizedBox(width: 8.w),
+                          Expanded(
                             child: Container(
                               padding: EdgeInsets.all(8.w),
                               decoration: BoxDecoration(
@@ -451,6 +513,8 @@ class _OrderListScreenState extends State<OrderListScreen> {
                               setState(() {
                                 _selectedProducts.removeAt(index);
                                 _selectedProductQuantities.removeAt(index);
+                                _selectedProductDiscounts.removeAt(index);
+                                _selectedProductBonuses.removeAt(index);
                               });
                             },
                           ),
@@ -593,6 +657,17 @@ class _OrderListScreenState extends State<OrderListScreen> {
                             return 0;
                           }).toList();
 
+                          // 🧮 Extract discount and bonus values for each product
+                          final discountValues = productList.map((p) {
+                            final discount = p["discount"];
+                            return discount is int ? discount : 0;
+                          }).toList();
+
+                          final bonusValues = productList.map((p) {
+                            final bonus = p["bonus"];
+                            return bonus is int ? bonus : 0;
+                          }).toList();
+
                           // 🧮 Totals
                           final grandTotalQty = quantities.fold(0, (sum, qty) => sum + qty);
                           final grandTotalPayableAmount = totals.fold(0, (sum, t) => sum + t);
@@ -637,7 +712,8 @@ class _OrderListScreenState extends State<OrderListScreen> {
                             grandTotalPayableAmount: grandTotalPayableAmount,
                             narration: _narrationController.text.trim(),
                             context: context,
-                            totalAmount: totals,
+                            discount: discountValues,
+                            bonus: bonusValues,
                           );
                         }
                       }
@@ -783,6 +859,8 @@ class _OrderListScreenState extends State<OrderListScreen> {
     }
 
     String currentQuantity = '';
+    String currentDiscount = '0';
+    String currentBonus = '0';
 
     await showDialog(
       context: context,
@@ -838,6 +916,50 @@ class _OrderListScreenState extends State<OrderListScreen> {
                         ),
                       ],
                     ),
+                    SizedBox(height: 8.h),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextFormField(
+                            initialValue: currentDiscount,
+                            decoration: InputDecoration(
+                              labelText: "Discount %",
+                              hintText: "Enter discount %",
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(6.r),
+                              ),
+                            ),
+                            keyboardType: TextInputType.number,
+                            onChanged: (value) {
+                              // Update the discount
+                              currentDiscount = value;
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 8.h),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextFormField(
+                            initialValue: currentBonus,
+                            decoration: InputDecoration(
+                              labelText: "Bonus %",
+                              hintText: "Enter bonus %",
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(6.r),
+                              ),
+                            ),
+                            keyboardType: TextInputType.number,
+                            onChanged: (value) {
+                              // Update the bonus
+                              currentBonus = value;
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),
@@ -863,6 +985,9 @@ class _OrderListScreenState extends State<OrderListScreen> {
                       return; // Don't proceed if no valid quantity
                     }
 
+                    final discountValue = int.tryParse(currentDiscount) ?? 0;
+                    final bonusValue = int.tryParse(currentBonus) ?? 0;
+
                     // Add product to selected list
                     setState(() {
                       // Check if product is already in the list
@@ -875,13 +1000,19 @@ class _OrderListScreenState extends State<OrderListScreen> {
                       }
 
                       if (existingIndex != -1) {
-                        // Update the existing product quantity
+                        // Update the existing product details
                         _selectedProducts[existingIndex] = {
                           'id': product.id,
                           'name': product.productName,
                           'price': double.tryParse(priceInfo?.productInfo?.price ?? "0") ?? 0,
                           'qty': quantityValue,
+                          'discount': discountValue,
+                          'bonus': bonusValue,
                         };
+                        // Update the quantities, discounts and bonuses lists
+                        _selectedProductQuantities[existingIndex] = quantityValue;
+                        _selectedProductDiscounts[existingIndex] = discountValue;
+                        _selectedProductBonuses[existingIndex] = bonusValue;
                       } else {
                         // Add new product
                         _selectedProducts.add({
@@ -889,13 +1020,13 @@ class _OrderListScreenState extends State<OrderListScreen> {
                           'name': product.productName,
                           'price': double.tryParse(priceInfo?.productInfo?.price ?? "0") ?? 0,
                           'qty': quantityValue,
+                          'discount': discountValue,
+                          'bonus': bonusValue,
                         });
-                      }
-                      // Also update the selected product quantities list
-                      if (existingIndex != -1) {
-                        _selectedProductQuantities[existingIndex] = quantityValue;
-                      } else {
+                        // Add to the corresponding lists
                         _selectedProductQuantities.add(quantityValue);
+                        _selectedProductDiscounts.add(discountValue);
+                        _selectedProductBonuses.add(bonusValue);
                       }
                     });
                     Navigator.of(context).pop();
@@ -1197,6 +1328,26 @@ class _OrderListScreenState extends State<OrderListScreen> {
                               style: TextStyle(
                                 fontSize: 12.sp,
                                 color: Colors.black87,
+                              ),
+                            ),
+                            Text(
+                              "Disc: ${selectedProduct["discount"] ?? 0}%",
+                              style: TextStyle(
+                                fontSize: 12.sp,
+                                color: Colors.orange,
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 2.h),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Bonus: ${selectedProduct["bonus"] ?? 0}%",
+                              style: TextStyle(
+                                fontSize: 12.sp,
+                                color: Colors.blue,
                               ),
                             ),
                             Text(

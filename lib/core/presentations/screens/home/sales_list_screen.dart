@@ -115,6 +115,8 @@ class _SalesListScreenState extends State<SalesListScreen> {
                     _buildInfoRow("Order Date", data.orderDate ?? "N/A"),
                     _buildInfoRow("Created At", data.createdAt ?? "N/A"),
                     _buildInfoRow("Total Quantity", data.totalQty ?? "0"),
+                    _buildInfoRow("Total Dealer Type", data.dealerType ?? "0"),
+                    _buildInfoRow("Narration", data.narration ?? "N/A"),
                     _buildInfoRow(
                       "Grand Total",
                       "৳ ${data.grandTotal ?? "0.00"}",

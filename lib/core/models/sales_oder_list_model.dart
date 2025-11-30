@@ -19,6 +19,8 @@ class SalesOrderListModel {
   final String? orderStatusText;
   final String? totalQty;
   final String? grandTotal;
+  final dynamic dealerType;
+  final String? narration;
 
   SalesOrderListModel({
     this.id,
@@ -32,6 +34,8 @@ class SalesOrderListModel {
     this.orderStatusText,
     this.totalQty,
     this.grandTotal,
+    this.dealerType,
+    this.narration,
   });
 
   factory SalesOrderListModel.fromJson(Map<String, dynamic> json) => SalesOrderListModel(
@@ -46,6 +50,8 @@ class SalesOrderListModel {
     orderStatusText: json["order_status_text"],
     totalQty: json["total_qty"],
     grandTotal: json["grand_total"],
+    dealerType: json["dealer_type"],
+    narration: json["narration"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -60,5 +66,7 @@ class SalesOrderListModel {
     "order_status_text": orderStatusText,
     "total_qty": totalQty,
     "grand_total": grandTotal,
+    "dealer_type": dealerType,
+    "narration": narration,
   };
 }
