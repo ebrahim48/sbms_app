@@ -402,121 +402,295 @@ class _OrderListScreenState extends State<OrderListScreen> {
                   ),
                 ),
               )
-                  : ListView.builder(
+                  : // ======== Improved Product List Item Widget ========
+
+              ListView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: _selectedProducts.length,
                 itemBuilder: (context, index) {
                   final selectedProduct = _selectedProducts[index];
                   return Card(
-                    elevation: 1,
-                    margin: EdgeInsets.symmetric(vertical: 6.h),
+                    elevation: 2,
+                    margin: EdgeInsets.symmetric(vertical: 8.h),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12.r),
+                    ),
                     child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
-                      child: Row(
+                      padding: EdgeInsets.all(12.w),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Expanded(
-                            flex: 3,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  selectedProduct["name"] ?? 'N/A',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                SizedBox(height: 4.h),
-                                Text(
-                                  "Price: ৳${selectedProduct["price"]}",
-                                  style: TextStyle(color: Colors.black54),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Expanded(
-                            flex: 2,
-                            child: TextFormField(
-                              initialValue: _selectedProductQuantities[index]?.toString() ?? "1",
-                              decoration: const InputDecoration(
-                                labelText: "Quantity",
-                                border: OutlineInputBorder(),
-                              ),
-                              keyboardType: TextInputType.number,
-                              onChanged: (val) {
-                                setState(() {
-                                  _selectedProductQuantities[index] = double.tryParse(val) ?? 1;
-                                  // Update the quantity in the selected product
-                                  _selectedProducts[index]["qty"] = _selectedProductQuantities[index];
-                                });
-                              },
-                            ),
-                          ),
-                          SizedBox(width: 8.w),
-                          Expanded(
-                            child: TextFormField(
-                              initialValue: _selectedProductDiscounts[index]?.toString() ?? "0",
-                              decoration: const InputDecoration(
-                                labelText: "Disc %",
-                                border: OutlineInputBorder(),
-                              ),
-                              keyboardType: TextInputType.number,
-                              onChanged: (val) {
-                                setState(() {
-                                  _selectedProductDiscounts[index] = int.tryParse(val) ?? 0;
-                                  // Update the discount in the selected product
-                                  _selectedProducts[index]["discount"] = _selectedProductDiscounts[index];
-                                });
-                              },
-                            ),
-                          ),
-                          SizedBox(width: 8.w),
-                          Expanded(
-                            child: TextFormField(
-                              initialValue: _selectedProductBonuses[index]?.toString() ?? "0",
-                              decoration: const InputDecoration(
-                                labelText: "Bonus %",
-                                border: OutlineInputBorder(),
-                              ),
-                              keyboardType: TextInputType.number,
-                              onChanged: (val) {
-                                setState(() {
-                                  _selectedProductBonuses[index] = int.tryParse(val) ?? 0;
-                                  // Update the bonus in the selected product
-                                  _selectedProducts[index]["bonus"] = _selectedProductBonuses[index];
-                                });
-                              },
-                            ),
-                          ),
-                          SizedBox(width: 8.w),
-                          Expanded(
-                            child: Container(
-                              padding: EdgeInsets.all(8.w),
-                              decoration: BoxDecoration(
-                                border: Border.all(color: Colors.grey),
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                              child: Text(
-                                (selectedProduct["price"] * _selectedProductQuantities[index])
-                                    .toStringAsFixed(2),
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
+                          // ===== Product Header with Delete Button =====
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      selectedProduct["name"] ?? 'N/A',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16.sp,
+                                        color: Colors.black87,
+                                      ),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    SizedBox(height: 4.h),
+                                    Row(
+                                      children: [
+                                        Text(
+                                          "৳ ${selectedProduct["price"]}",
+                                          style: TextStyle(
+                                            color: Colors.green,
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 14.sp,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
                                 ),
                               ),
-                            ),
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.red.shade50,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: IconButton(
+                                  icon: Icon(Icons.delete_outline, color: Colors.red),
+                                  iconSize: 22.sp,
+                                  onPressed: () {
+                                    setState(() {
+                                      _selectedProducts.removeAt(index);
+                                      _selectedProductQuantities.removeAt(index);
+                                      _selectedProductDiscounts.removeAt(index);
+                                      _selectedProductBonuses.removeAt(index);
+                                    });
+                                  },
+                                ),
+                              ),
+                            ],
                           ),
-                          SizedBox(width: 8.w),
-                          IconButton(
-                            icon: Icon(Icons.delete, color: Colors.red),
-                            onPressed: () {
-                              setState(() {
-                                _selectedProducts.removeAt(index);
-                                _selectedProductQuantities.removeAt(index);
-                                _selectedProductDiscounts.removeAt(index);
-                                _selectedProductBonuses.removeAt(index);
-                              });
-                            },
+
+                          SizedBox(height: 12.h),
+                          Divider(height: 1, color: Colors.grey.shade300),
+                          SizedBox(height: 12.h),
+
+                          // ===== Input Fields - Two Rows Layout =====
+
+                          Row(
+                            children: [
+                              // Quantity Field
+                              Expanded(
+                                flex: 3,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "Quantity",
+                                      style: TextStyle(
+                                        fontSize: 12.sp,
+                                        color: Colors.grey.shade700,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    SizedBox(height: 6.h),
+                                    TextFormField(
+                                      initialValue: _selectedProductQuantities[index]?.toString() ?? "1",
+                                      decoration: InputDecoration(
+                                        hintText: "0",
+                                        filled: true,
+                                        fillColor: Colors.grey.shade50,
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(8.r),
+                                          borderSide: BorderSide(color: Colors.grey.shade300),
+                                        ),
+                                        enabledBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(8.r),
+                                          borderSide: BorderSide(color: Colors.grey.shade300),
+                                        ),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(8.r),
+                                          borderSide: BorderSide(color: AppColors.primaryColor, width: 2),
+                                        ),
+                                        contentPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
+                                        prefixIcon: Icon(Icons.format_list_numbered, size: 18.sp, color: AppColors.primaryColor),
+                                      ),
+                                      keyboardType: TextInputType.number,
+                                      style: TextStyle(fontWeight: FontWeight.w600),
+                                      onChanged: (val) {
+                                        setState(() {
+                                          _selectedProductQuantities[index] = double.tryParse(val) ?? 1;
+                                          _selectedProducts[index]["qty"] = _selectedProductQuantities[index];
+                                        });
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(width: 12.w),
+
+                              // Discount Field
+                              Expanded(
+                                flex: 2,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "Dic",
+                                      style: TextStyle(
+                                        fontSize: 12.sp,
+                                        color: Colors.grey.shade700,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    SizedBox(height: 6.h),
+                                    TextFormField(
+                                      initialValue: _selectedProductDiscounts[index]?.toString() ?? "0",
+                                      decoration: InputDecoration(
+                                        hintText: "0",
+                                        filled: true,
+                                        fillColor: Colors.orange.shade50,
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(8.r),
+                                          borderSide: BorderSide(color: Colors.orange.shade200),
+                                        ),
+                                        enabledBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(8.r),
+                                          borderSide: BorderSide(color: Colors.orange.shade200),
+                                        ),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(8.r),
+                                          borderSide: BorderSide(color: Colors.orange, width: 2),
+                                        ),
+                                        contentPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
+                                        suffixText: "",
+                                        suffixStyle: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold),
+                                      ),
+                                      keyboardType: TextInputType.number,
+                                      style: TextStyle(fontWeight: FontWeight.w600, color: Colors.orange.shade900),
+                                      onChanged: (val) {
+                                        setState(() {
+                                          _selectedProductDiscounts[index] = int.tryParse(val) ?? 0;
+                                          _selectedProducts[index]["discount"] = _selectedProductDiscounts[index];
+                                        });
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          SizedBox(height: 12.h),
+
+                          // Second Row: Bonus & Total
+                          Row(
+                            children: [
+                              // Bonus Field
+                              Expanded(
+                                flex: 2,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "Bonus",
+                                      style: TextStyle(
+                                        fontSize: 12.sp,
+                                        color: Colors.grey.shade700,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    SizedBox(height: 6.h),
+                                    TextFormField(
+                                      initialValue: _selectedProductBonuses[index]?.toString() ?? "0",
+                                      decoration: InputDecoration(
+                                        hintText: "0",
+                                        filled: true,
+                                        fillColor: Colors.blue.shade50,
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(8.r),
+                                          borderSide: BorderSide(color: Colors.blue.shade200),
+                                        ),
+                                        enabledBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(8.r),
+                                          borderSide: BorderSide(color: Colors.blue.shade200),
+                                        ),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(8.r),
+                                          borderSide: BorderSide(color: Colors.blue, width: 2),
+                                        ),
+                                        contentPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
+                                        suffixText: "",
+                                        suffixStyle: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
+                                      ),
+                                      keyboardType: TextInputType.number,
+                                      style: TextStyle(fontWeight: FontWeight.w600, color: Colors.blue.shade900),
+                                      onChanged: (val) {
+                                        setState(() {
+                                          _selectedProductBonuses[index] = int.tryParse(val) ?? 0;
+                                          _selectedProducts[index]["bonus"] = _selectedProductBonuses[index];
+                                        });
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(width: 12.w),
+
+                              // Total Amount Display
+                              Expanded(
+                                flex: 3,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "Total Amount",
+                                      style: TextStyle(
+                                        fontSize: 12.sp,
+                                        color: Colors.grey.shade700,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    SizedBox(height: 6.h),
+                                    Container(
+                                      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
+                                      decoration: BoxDecoration(
+                                        color: Colors.green.shade50,
+                                        border: Border.all(color: Colors.green.shade300, width: 1.5),
+                                        borderRadius: BorderRadius.circular(8.r),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Text(
+                                            "৳",
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 16.sp,
+                                              color: Colors.green.shade700,
+                                            ),
+                                          ),
+                                          SizedBox(width: 12.h,),
+                                          Text(
+                                            (selectedProduct["price"] * _selectedProductQuantities[index])
+                                                .toStringAsFixed(2),
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 16.sp,
+                                              color: Colors.green.shade700,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -886,7 +1060,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
                     ),
                     SizedBox(height: 8.h),
                     Text(
-                      "Price: ৳${priceInfo?.productInfo?.price ?? 'N/A'}",
+                      "Price: ৳ ${priceInfo?.productInfo?.price ?? 'N/A'}",
                       style: TextStyle(fontSize: 14.sp, color: Colors.green),
                     ),
                     SizedBox(height: 8.h),
@@ -916,7 +1090,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
                         ),
                       ],
                     ),
-                    SizedBox(height: 8.h),
+                    SizedBox(height: 16.h),
                     Row(
                       children: [
                         Expanded(
@@ -924,7 +1098,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
                             initialValue: currentDiscount,
                             decoration: InputDecoration(
                               labelText: "Discount %",
-                              hintText: "Enter discount %",
+                              hintText: "Enter discount",
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(6.r),
                               ),
@@ -938,15 +1112,15 @@ class _OrderListScreenState extends State<OrderListScreen> {
                         ),
                       ],
                     ),
-                    SizedBox(height: 8.h),
+                    SizedBox(height: 16.h),
                     Row(
                       children: [
                         Expanded(
                           child: TextFormField(
                             initialValue: currentBonus,
                             decoration: InputDecoration(
-                              labelText: "Bonus %",
-                              hintText: "Enter bonus %",
+                              labelText: "Bonus",
+                              hintText: "Enter bonus",
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(6.r),
                               ),
@@ -1331,7 +1505,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
                               ),
                             ),
                             Text(
-                              "Disc: ${selectedProduct["discount"] ?? 0}%",
+                              "Disc: ${selectedProduct["discount"] ?? 0}",
                               style: TextStyle(
                                 fontSize: 12.sp,
                                 color: Colors.orange,
@@ -1344,7 +1518,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              "Bonus: ${selectedProduct["bonus"] ?? 0}%",
+                              "Bonus: ${selectedProduct["bonus"] ?? 0}",
                               style: TextStyle(
                                 fontSize: 12.sp,
                                 color: Colors.blue,
