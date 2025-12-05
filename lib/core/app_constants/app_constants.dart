@@ -19,7 +19,8 @@ class AppConstants{
       r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
 
   static bool validatePassword(String value) {
-    RegExp regex = RegExp(r'^(?=.*[0-9])(?=.*[a-zA-Z]).{6,}$');
-    return regex.hasMatch(value);
+    // Currently not used - password validation is now just length check
+    // Keeping for potential future use
+    return value.length >= 8;
   }
 }

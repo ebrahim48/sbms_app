@@ -82,65 +82,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  /// =============================> Date Field ==========================>
-                  GestureDetector(
-                    onTap: _pickDate,
-                    child: AbsorbPointer(
-                      child: TextFormField(
-                        decoration: InputDecoration(
-                          labelText: "Date",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          filled: true,
-                          fillColor: Colors.white,
-                          suffixIcon: const Icon(Icons.calendar_today, color: AppColors.primaryColor),
-                          contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
-                        ),
-                        controller: TextEditingController(
-                          text: _selectedDate == null
-                              ? ''
-                              : "${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}",
-                        ),
-                      ),
-                    ),
-                  ),
                   SizedBox(height: 10.h),
-
-
-                    /// =============================> Vendor Field with Search ==========================>
-                    Container(
-                    decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(8),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Color(0x08000000),
-                        offset: Offset(0, 4),
-                        blurRadius: 4,
-                      ),
-                    ],
-                  ),
-          child: ListTile(
-            leading: Icon(Icons.business, color: AppColors.primaryColor),
-            title: Text(
-              _vendorName ?? "Select Vendor",
-              style: TextStyle(
-                color: _vendorName != null ? Colors.black : Colors.grey.shade600,
-                fontSize: 16.sp,
-              ),
-            ),
-            trailing: Icon(Icons.arrow_drop_down),
-            onTap: () {
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                if (mounted) {
-                  _showSearchableDealerDialog();
-                }
-              });
-            },
-          ),
-        ),  SizedBox(height: 10.h),
 
                   /// =============================> Invoice Field ==========================>
                   Obx(() {
@@ -182,7 +124,73 @@ class _OrderListScreenState extends State<OrderListScreen> {
                       ),
                     );
                   }),
-                  SizedBox(height: 10.h),
+                  SizedBox(height: 16.h),
+
+                  /// =============================> Warehouse Field ==========================>
+                  DropdownButtonFormField<int>(
+                    decoration: InputDecoration(
+                      labelText: 'Warehouse',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                      contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+                    ),
+                    value: _warehouseId,
+                    items: [
+                      DropdownMenuItem(
+                        value: null,
+                        child: Text(
+                          'Select Warehouse',
+                          style: TextStyle(
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.grey.shade600,
+                          ),
+                        ),
+                      ),
+                      ...?productListController.wareHouseList.value.warehouseInfo?.map((warehouse) => DropdownMenuItem(
+                        value: warehouse.id,
+                        child: Row(
+                          children: [
+                            Text(
+                              '${warehouse.id ?? 'N/A'} - ',
+                              style: TextStyle(
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            Text(
+                              warehouse.warehouseName ?? 'N/A',
+                              style: TextStyle(
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )).toList(),
+                    ],
+                    validator: (value) {
+                      if (value == null) {
+                        return 'Please select a warehouse';
+                      }
+                      return null;
+                    },
+                    onChanged: (val) {
+                      setState(() {
+                        _warehouseId = val;
+                        if (val != null) {
+                          // Add your logic here
+                        }
+                      });
+                    },
+                    isExpanded: true,
+                    menuMaxHeight: 300,
+                  ),
+
+                  SizedBox(height: 16.h),
 
                   /// =============================> Type Field ==========================>
                   DropdownButtonFormField<String>(
@@ -204,7 +212,70 @@ class _OrderListScreenState extends State<OrderListScreen> {
                         .toList(),
                     onChanged: (val) => setState(() => _type = val),
                   ),
-                  SizedBox(height: 10.h),
+
+                  SizedBox(height: 16.h),
+                  /// =============================> Date Field ==========================>
+                  GestureDetector(
+                    onTap: _pickDate,
+                    child: AbsorbPointer(
+                      child: TextFormField(
+                        decoration: InputDecoration(
+                          labelText: "Date",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          filled: true,
+                          fillColor: Colors.white,
+                          suffixIcon: const Icon(Icons.calendar_today, color: AppColors.primaryColor),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+                        ),
+                        controller: TextEditingController(
+                          text: _selectedDate == null
+                              ? ''
+                              : "${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}",
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 16.h),
+
+
+                    /// =============================> Vendor Field with Search ==========================>
+                    Container(
+                    decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(8),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Color(0x08000000),
+                        offset: Offset(0, 4),
+                        blurRadius: 4,
+                      ),
+                    ],
+                  ),
+          child: ListTile(
+            leading: Icon(Icons.business, color: AppColors.primaryColor),
+            title: Text(
+              _vendorName ?? "Select Vendor",
+              style: TextStyle(
+                color: _vendorName != null ? Colors.black : Colors.grey.shade600,
+                fontSize: 16.sp,
+              ),
+            ),
+            trailing: Icon(Icons.arrow_drop_down),
+            onTap: () {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (mounted) {
+                  _showSearchableDealerDialog();
+                }
+              });
+            },
+          ),
+        ),
+
+
+                  SizedBox(height: 16.h),
 
                   /// =============================> Dealer Type Field ==========================>
                   DropdownButtonFormField<String>(
@@ -226,56 +297,10 @@ class _OrderListScreenState extends State<OrderListScreen> {
                         .toList(),
                     onChanged: (val) => setState(() => _dealerType = val),
                   ),
-                  SizedBox(height: 10.h),
 
-                  /// =============================> Warehouse Field ==========================>
-                  DropdownButtonFormField<int>(
-                    decoration: InputDecoration(
-                      labelText: 'Warehouse',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      filled: true,
-                      fillColor: Colors.white,
-                      contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
-                    ),
-                    value: _warehouseId,
-                    items: productListController.wareHouseList.value.warehouseInfo
-                        ?.map((warehouse) => DropdownMenuItem(
-                      value: warehouse.id,
-                      child: Row(
-                        children: [
-                          Text(
-                            '${warehouse.id ?? 'N/A'} - ',
-                            style: TextStyle(
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          Text(
-                            warehouse.warehouseName ?? 'N/A',
-                            style: TextStyle(
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ))
-                        .toList() ??
-                        [],
-                    onChanged: (val) => setState(() {
-                      _warehouseId = val;
-                      if (val != null) {
-                        // Add your logic here
-                      }
-                    }),
-                    isExpanded: true,
-                    menuMaxHeight: 300,
-                  ),
-                  SizedBox(height: 16.h),
                 ],
               ),
+              SizedBox(height: 16.h),
               ///======================================> Product Selection Section ==============================>
 
               Row(
@@ -541,7 +566,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      "Dic",
+                                      "Dis",
                                       style: TextStyle(
                                         fontSize: 12.sp,
                                         color: Colors.grey.shade700,
@@ -664,26 +689,62 @@ class _OrderListScreenState extends State<OrderListScreen> {
                                         border: Border.all(color: Colors.green.shade300, width: 1.5),
                                         borderRadius: BorderRadius.circular(8.r),
                                       ),
-                                      child: Row(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                                          Text(
-                                            "৳",
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 16.sp,
-                                              color: Colors.green.shade700,
-                                            ),
+                                          // Display Subtotal (Price * Quantity)
+                                          Row(
+                                            children: [
+                                              Text(
+                                                "৳",
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 14.sp,
+                                                  color: Colors.green.shade700,
+                                                ),
+                                              ),
+                                              SizedBox(width: 4.h,),
+                                              Text(
+                                                (selectedProduct["price"] * _selectedProductQuantities[index]).toStringAsFixed(2),
+                                                style: TextStyle(
+                                                  fontSize: 12.sp,
+                                                  color: Colors.green.shade600,
+                                                  decoration: _selectedProductDiscounts[index] > 0 ? TextDecoration.lineThrough : null,
+                                                ),
+                                              ),
+                                              if (_selectedProductDiscounts[index] > 0)
+                                                SizedBox(width: 4.h,),
+                                              if (_selectedProductDiscounts[index] > 0)
+                                                Text(
+                                                  "৳ ${(selectedProduct["price"] * _selectedProductQuantities[index] - ((selectedProduct["price"] * _selectedProductQuantities[index]) * _selectedProductDiscounts[index] / 100)).toStringAsFixed(2)}",
+                                                  style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 14.sp,
+                                                    color: Colors.red.shade700,
+                                                  ),
+                                                ),
+                                            ],
                                           ),
-                                          SizedBox(width: 12.h,),
-                                          Text(
-                                            (selectedProduct["price"] * _selectedProductQuantities[index])
-                                                .toStringAsFixed(2),
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 16.sp,
-                                              color: Colors.green.shade700,
+                                          if (_selectedProductDiscounts[index] > 0)
+                                            Row(
+                                              children: [
+                                                Text(
+                                                  "${_selectedProductDiscounts[index]}% Discount:",
+                                                  style: TextStyle(
+                                                    fontSize: 10.sp,
+                                                    color: Colors.orange.shade700,
+                                                  ),
+                                                ),
+                                                SizedBox(width: 4.h,),
+                                                Text(
+                                                  "৳ ${((selectedProduct["price"] * _selectedProductQuantities[index]) * _selectedProductDiscounts[index] / 100).toStringAsFixed(2)}",
+                                                  style: TextStyle(
+                                                    fontSize: 10.sp,
+                                                    color: Colors.orange.shade700,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                          ),
                                         ],
                                       ),
                                     ),
@@ -726,7 +787,51 @@ class _OrderListScreenState extends State<OrderListScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          "Grand Total Quantity:",
+                          "Discount amount:",
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black87,
+                          ),
+                        ),
+                        Text(
+                          "৳ ${_calculateTotalDiscount().toStringAsFixed(2)}",
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.orange.shade700,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 8.h),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Gross receivable:",
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black87,
+                          ),
+                        ),
+                        Text(
+                          "৳ ${_calculateGrossReceivable().toStringAsFixed(2)}",
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primaryColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 8.h),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Total Quantity:",
                           style: TextStyle(
                             fontSize: 14.sp,
                             fontWeight: FontWeight.w500,
@@ -748,7 +853,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          "Grand Total Payable:",
+                          "Net receivable amount:",
                           style: TextStyle(
                             fontSize: 14.sp,
                             fontWeight: FontWeight.w500,
@@ -756,7 +861,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
                           ),
                         ),
                         Text(
-                          "৳ ${_selectedProducts.fold<num>(0, (sum, item) => sum + (item['price'] as num) * (item['qty'] as num))}",
+                          "৳ ${_calculateGrandTotalWithDiscount()}",
                           style: TextStyle(
                             fontSize: 14.sp,
                             fontWeight: FontWeight.bold,
@@ -822,14 +927,17 @@ class _OrderListScreenState extends State<OrderListScreen> {
                             return qty is num ? qty.toInt() : 0;
                           }).toList();
 
-                          final totals = productList.map((p) {
+                          final totals = productList.asMap().map((index, p) {
                             final price = p["price"];
                             final qty = p["qty"];
+                            final discountPercent = _selectedProductDiscounts[index] ?? 0;
                             if (price is num && qty is num) {
-                              return (price * qty).toInt();
+                              double subTotal = price.toDouble() * qty.toDouble();
+                              double discountAmount = (subTotal * discountPercent) / 100;
+                              return MapEntry(index, (subTotal - discountAmount).toInt());
                             }
-                            return 0;
-                          }).toList();
+                            return MapEntry(index, 0);
+                          }).values.toList();
 
                           // 🧮 Extract discount and bonus values for each product
                           final discountValues = productList.map((p) {
@@ -1063,11 +1171,11 @@ class _OrderListScreenState extends State<OrderListScreen> {
                       "Price: ৳ ${priceInfo?.productInfo?.price ?? 'N/A'}",
                       style: TextStyle(fontSize: 14.sp, color: Colors.green),
                     ),
-                    SizedBox(height: 8.h),
-                    Text(
-                      "Stock: ${priceInfo?.productInfo?.stock ?? 'N/A'}",
-                      style: TextStyle(fontSize: 14.sp, color: Colors.red),
-                    ),
+                    // SizedBox(height: 8.h),
+                    // Text(
+                    //   "Stock: ${priceInfo?.productInfo?.stock ?? 'N/A'}",
+                    //   style: TextStyle(fontSize: 14.sp, color: Colors.red),
+                    // ),
                     SizedBox(height: 16.h),
                     Row(
                       children: [
@@ -1174,7 +1282,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
                       }
 
                       if (existingIndex != -1) {
-                        // Update the existing product details
+
                         _selectedProducts[existingIndex] = {
                           'id': product.id,
                           'name': product.productName,
@@ -1183,7 +1291,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
                           'discount': discountValue,
                           'bonus': bonusValue,
                         };
-                        // Update the quantities, discounts and bonuses lists
+
                         _selectedProductQuantities[existingIndex] = quantityValue;
                         _selectedProductDiscounts[existingIndex] = discountValue;
                         _selectedProductBonuses[existingIndex] = bonusValue;
@@ -1197,7 +1305,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
                           'discount': discountValue,
                           'bonus': bonusValue,
                         });
-                        // Add to the corresponding lists
+
                         _selectedProductQuantities.add(quantityValue);
                         _selectedProductDiscounts.add(discountValue);
                         _selectedProductBonuses.add(bonusValue);
@@ -1231,7 +1339,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
   }
 
 
-  // Show a dialog with searchable dealer list
+
   Future<void> _showSearchableDealerDialog() async {
     // Check if the widget is still mounted before showing the dialog
     if (!mounted) return;
@@ -1319,101 +1427,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
 
 
 
-  // // Show a dialog with searchable dealer list
-  // Future<void> _showSearchableDealerDialog() async {
-  //   // Check if the widget is still mounted before showing the dialog
-  //   if (!mounted) return;
-  //
-  //   final dealers = (productListController.dealerList.value.dealerInfo ?? []);
-  //   List<dynamic> filteredDealers = List.from(dealers);
-  //   String searchQuery = '';
-  //
-  //   await showDialog(
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return StatefulBuilder(
-  //         builder: (BuildContext context, StateSetter setState) {
-  //           return AlertDialog(
-  //             title: Column(
-  //               children: [
-  //                 TextField(
-  //                   decoration: InputDecoration(
-  //                     hintText: "Search vendors...",
-  //                     prefixIcon: Icon(Icons.search, color: AppColors.primaryColor),
-  //                     border: OutlineInputBorder(
-  //                       borderRadius: BorderRadius.circular(8),
-  //                     ),
-  //                   ),
-  //                   onChanged: (value) {
-  //                     setState(() {
-  //                       searchQuery = value.toLowerCase();
-  //                       filteredDealers = dealers.where((dealer) {
-  //                         final name = (dealer.dealerName ?? '').toLowerCase();
-  //                         final id = (dealer.id?.toString() ?? '').toLowerCase();
-  //                         return name.contains(searchQuery) || id.contains(searchQuery);
-  //                       }).toList();
-  //                     });
-  //                   },
-  //                 ),
-  //                 SizedBox(height: 10),
-  //                 Divider(),
-  //               ],
-  //             ),
-  //             content: Container(
-  //               width: double.maxFinite,
-  //               height: 400, // Add fixed height to prevent overflow
-  //               child: ListView.builder(
-  //                 shrinkWrap: true,
-  //                 itemCount: filteredDealers.length,
-  //                 itemBuilder: (BuildContext context, int index) {
-  //                   final dealer = filteredDealers[index];
-  //                   return ListTile(
-  //                     title: Text(
-  //                       dealer.dealerName ?? 'N/A',
-  //                       style: TextStyle(
-  //                         fontWeight: FontWeight.w500,
-  //                       ),
-  //                     ),
-  //                     subtitle: Text('ID: ${dealer.id ?? 'N/A'}'),
-  //                     onTap: () {
-  //                       // Capture the selected values
-  //                       final selectedDealerId = dealer.id;
-  //                       final selectedDealerName = dealer.dealerName;
-  //
-  //                       // Close the dialog first
-  //                       Navigator.of(context).pop();
-  //
-  //                       // Use the main context of the widget to update the state
-  //                       // This ensures we're updating the correct widget's state
-  //                       WidgetsBinding.instance.addPostFrameCallback((_) {
-  //                         if (mounted) {
-  //                           setState(() {
-  //                             _vendorId = selectedDealerId;
-  //                             _vendorName = selectedDealerName;
-  //                           });
-  //                         }
-  //                       });
-  //                     },
-  //                   );
-  //                 },
-  //               ),
-  //             ),
-  //             actions: [
-  //               TextButton(
-  //                 onPressed: () {
-  //                   Navigator.of(context).pop();
-  //                 },
-  //                 child: Text('Cancel', style: TextStyle(color: Colors.red)),
-  //               ),
-  //             ],
-  //           );
-  //         },
-  //       );
-  //     },
-  //   );
-  // }
 
-  // Show a dialog with selected products
   Future<void> _showSelectedProductsPopup() async {
     // Check if the widget is still mounted before showing the dialog
     if (!mounted) return;
@@ -1517,6 +1531,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
+
                             Text(
                               "Bonus: ${selectedProduct["bonus"] ?? 0}",
                               style: TextStyle(
@@ -1524,6 +1539,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
                                 color: Colors.blue,
                               ),
                             ),
+
                             Text(
                               "Total: ${(selectedProduct["price"] * (_selectedProductQuantities[index] ?? 1)).toStringAsFixed(2)}",
                               style: TextStyle(
@@ -1554,7 +1570,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
     );
   }
 
-  // Show invoice information dialog
+
   Future<void> _showInvoiceInfoDialog() async {
     // Check if widget is still mounted
     if (!mounted) return;
@@ -1591,6 +1607,70 @@ class _OrderListScreenState extends State<OrderListScreen> {
         );
       },
     );
+  }
+
+  // Method to calculate total discount amount
+  double _calculateTotalDiscount() {
+    double totalDiscount = 0.0;
+
+    for (int i = 0; i < _selectedProducts.length; i++) {
+      final product = _selectedProducts[i];
+      final price = product['price'] as num;
+      final quantity = _selectedProductQuantities[i];
+      final discountPercent = _selectedProductDiscounts[i] as int;
+
+      // Calculate subtotal: price * quantity
+      double subTotal = price.toDouble() * quantity;
+
+      // Calculate discount amount: (subtotal * discountPercent) / 100
+      double discountAmount = (subTotal * discountPercent) / 100;
+
+      totalDiscount += discountAmount;
+    }
+
+    return totalDiscount;
+  }
+
+  // Method to calculate gross receivable (total before discount)
+  double _calculateGrossReceivable() {
+    double grossTotal = 0.0;
+
+    for (int i = 0; i < _selectedProducts.length; i++) {
+      final product = _selectedProducts[i];
+      final price = product['price'] as num;
+      final quantity = _selectedProductQuantities[i];
+
+      // Calculate subtotal: price * quantity
+      double subTotal = price.toDouble() * quantity;
+      grossTotal += subTotal;
+    }
+
+    return grossTotal;
+  }
+
+  // Method to calculate grand total with discount
+  double _calculateGrandTotalWithDiscount() {
+    double total = 0.0;
+
+    for (int i = 0; i < _selectedProducts.length; i++) {
+      final product = _selectedProducts[i];
+      final price = product['price'] as num;
+      final quantity = _selectedProductQuantities[i];
+      final discountPercent = _selectedProductDiscounts[i] as int;
+
+      // Calculate subtotal: price * quantity
+      double subTotal = price.toDouble() * quantity;
+
+      // Calculate discount: (subtotal * discountPercent) / 100
+      double discountAmount = (subTotal * discountPercent) / 100;
+
+      // Calculate final amount: subtotal - discountAmount
+      double finalAmount = subTotal - discountAmount;
+
+      total += finalAmount;
+    }
+
+    return total;
   }
 
 }

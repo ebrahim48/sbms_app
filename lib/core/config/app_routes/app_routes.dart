@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sbms_apps/core/helpers/auth_helper.dart';
 import 'package:sbms_apps/core/presentations/screens/home/create_list_screen.dart';
 import 'package:sbms_apps/core/presentations/screens/home/home_screen.dart';
 import 'package:sbms_apps/core/presentations/screens/home/order_list_screen.dart';
@@ -46,13 +47,13 @@ class AppRoutes {
         path: splashScreen,
         name: splashScreen,
         builder: (context, state) => const SplashScreen(),
-        redirect: (context, state) {
-          Future.delayed(const Duration(seconds: 3), () async {
-              AppRoutes.goRouter.replaceNamed(AppRoutes.onBoardingScreen);
-            }
-          );
-
-          return;
+        redirect: (context, state) async {
+          await Future.delayed(const Duration(seconds: 3));
+          bool authenticated = await AuthHelper.isLoggedIn();
+          if (authenticated) {
+            return AppRoutes.homeScreen;
+          }
+          return AppRoutes.onBoardingScreen;
         },
       ),
 
@@ -85,6 +86,14 @@ class AppRoutes {
         name: logInScreen,
         pageBuilder:
             (context, state) => _customTransitionPage(LoginInScreen(), state),
+        redirect: (context, state) async {
+          // If already logged in, go directly to home
+          bool authenticated = await AuthHelper.isLoggedIn();
+          if (authenticated) {
+            return AppRoutes.homeScreen;
+          }
+          return null;
+        },
       ),
 
 
@@ -94,6 +103,14 @@ class AppRoutes {
         name: homeScreen,
         pageBuilder:
             (context, state) => _customTransitionPage(HomeScreen(), state),
+        redirect: (context, state) async {
+          // Redirect to login if not authenticated
+          bool authenticated = await AuthHelper.isLoggedIn();
+          if (!authenticated) {
+            return AppRoutes.logInScreen;
+          }
+          return null;
+        },
       ),
 
       ///<<<=============>>> Product List Screen<<<===============>>>
@@ -102,6 +119,14 @@ class AppRoutes {
         name: productListScreen,
         pageBuilder:
             (context, state) => _customTransitionPage(ProductListScreen(), state),
+        redirect: (context, state) async {
+          // Redirect to login if not authenticated
+          bool authenticated = await AuthHelper.isLoggedIn();
+          if (!authenticated) {
+            return AppRoutes.logInScreen;
+          }
+          return null;
+        },
       ),
 
 
@@ -110,6 +135,14 @@ class AppRoutes {
         name: createScreen,
         pageBuilder:
             (context, state) => _customTransitionPage(CreateScreen(), state),
+        redirect: (context, state) async {
+          // Redirect to login if not authenticated
+          bool authenticated = await AuthHelper.isLoggedIn();
+          if (!authenticated) {
+            return AppRoutes.logInScreen;
+          }
+          return null;
+        },
       ),
 
       GoRoute(
@@ -117,30 +150,70 @@ class AppRoutes {
         name: orderListScreen,
         pageBuilder:
             (context, state) => _customTransitionPage(OrderListScreen(), state),
+        redirect: (context, state) async {
+          // Redirect to login if not authenticated
+          bool authenticated = await AuthHelper.isLoggedIn();
+          if (!authenticated) {
+            return AppRoutes.logInScreen;
+          }
+          return null;
+        },
       ),
       GoRoute(
         path: viewProfileScreen,
         name: viewProfileScreen,
         pageBuilder:
             (context, state) => _customTransitionPage(ViewProfileScreen(), state),
+        redirect: (context, state) async {
+          // Redirect to login if not authenticated
+          bool authenticated = await AuthHelper.isLoggedIn();
+          if (!authenticated) {
+            return AppRoutes.logInScreen;
+          }
+          return null;
+        },
       ),
       GoRoute(
         path: editProfileScreen,
         name: editProfileScreen,
         pageBuilder:
             (context, state) => _customTransitionPage(EditProfileScreen(), state),
+        redirect: (context, state) async {
+          // Redirect to login if not authenticated
+          bool authenticated = await AuthHelper.isLoggedIn();
+          if (!authenticated) {
+            return AppRoutes.logInScreen;
+          }
+          return null;
+        },
       ),
       GoRoute(
         path: salesListScreen,
         name: salesListScreen,
         pageBuilder:
             (context, state) => _customTransitionPage(SalesListScreen(), state),
+        redirect: (context, state) async {
+          // Redirect to login if not authenticated
+          bool authenticated = await AuthHelper.isLoggedIn();
+          if (!authenticated) {
+            return AppRoutes.logInScreen;
+          }
+          return null;
+        },
       ),
       GoRoute(
         path: bankReceiveListScreen,
         name: bankReceiveListScreen,
         pageBuilder:
             (context, state) => _customTransitionPage(BankReceiveListScreen(), state),
+        redirect: (context, state) async {
+          // Redirect to login if not authenticated
+          bool authenticated = await AuthHelper.isLoggedIn();
+          if (!authenticated) {
+            return AppRoutes.logInScreen;
+          }
+          return null;
+        },
       ),
 
 

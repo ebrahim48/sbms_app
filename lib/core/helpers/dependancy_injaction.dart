@@ -1,5 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import '../../controllers/auth_controller.dart';
 
 
 class DependencyInjection implements Bindings {
@@ -8,7 +9,7 @@ class DependencyInjection implements Bindings {
 
   @override
   void dependencies() {
-    // Get.lazyPut(() => AuthController(), fenix: true);
+    Get.lazyPut(() => AuthController(), fenix: true);
     // Get.lazyPut(() => CustomerHomeController(), fenix: true);
     // Get.lazyPut(() => CustomerBookingController(), fenix: true);
     // Get.lazyPut(() => MechanicJobController(), fenix: true);

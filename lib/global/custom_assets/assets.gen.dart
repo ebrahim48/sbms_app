@@ -38,6 +38,9 @@ class $AssetsIconsGen {
 class $AssetsImagesGen {
   const $AssetsImagesGen();
 
+  /// File path: assets/images/Logored.png
+  AssetGenImage get logored => const AssetGenImage('assets/images/Logored.png');
+
   /// File path: assets/images/aboutus.png
   AssetGenImage get aboutus => const AssetGenImage('assets/images/aboutus.png');
 
@@ -90,6 +93,7 @@ class $AssetsImagesGen {
 
   /// List of all assets
   List<AssetGenImage> get values => [
+    logored,
     aboutus,
     banner,
     camera,

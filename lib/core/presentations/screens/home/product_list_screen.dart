@@ -76,55 +76,55 @@ class _ProductListScreenState extends State<ProductListScreen> {
                     ),
                   ),
                 ),
-                SizedBox(width: 12.w),
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.grey[200],
-                    borderRadius: BorderRadius.circular(8.r),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        onPressed: () {
-                          setState(() {
-                            _isTableView = true;
-                          });
-                        },
-                        icon: Icon(
-                          Icons.table_rows,
-                          size: 20.sp,
-                          color: _isTableView ? Colors.white : Colors.grey.shade700,
-                        ),
-                        color: _isTableView ? AppColors.primaryColor : Colors.transparent,
-                        padding: EdgeInsets.symmetric(horizontal: 8.w),
-                        constraints: BoxConstraints(minWidth: 36.w, minHeight: 36.h),
-                        tooltip: 'Table View',
-                      ),
-                      IconButton(
-                        onPressed: () {
-                          setState(() {
-                            _isTableView = false;
-                          });
-                        },
-                        icon: Icon(
-                          Icons.list,
-                          size: 20.sp,
-                          color: !_isTableView ? Colors.white : Colors.grey.shade700,
-                        ),
-                        color: !_isTableView ? AppColors.primaryColor : Colors.transparent,
-                        padding: EdgeInsets.symmetric(horizontal: 8.w),
-                        constraints: BoxConstraints(minWidth: 36.w, minHeight: 36.h),
-                        tooltip: 'List View',
-                      ),
-                    ],
-                  ),
-                ),
+                // SizedBox(width: 12.w),
+                // Container(
+                //   decoration: BoxDecoration(
+                //     color: Colors.grey[200],
+                //     borderRadius: BorderRadius.circular(8.r),
+                //   ),
+                //   child: Row(
+                //     mainAxisSize: MainAxisSize.min,
+                //     children: [
+                //       IconButton(
+                //         onPressed: () {
+                //           setState(() {
+                //             _isTableView = true;
+                //           });
+                //         },
+                //         icon: Icon(
+                //           Icons.table_rows,
+                //           size: 20.sp,
+                //           color: _isTableView ? Colors.white : Colors.grey.shade700,
+                //         ),
+                //         color: _isTableView ? AppColors.primaryColor : Colors.transparent,
+                //         padding: EdgeInsets.symmetric(horizontal: 8.w),
+                //         constraints: BoxConstraints(minWidth: 36.w, minHeight: 36.h),
+                //         tooltip: 'Table View',
+                //       ),
+                //       IconButton(
+                //         onPressed: () {
+                //           setState(() {
+                //             _isTableView = false;
+                //           });
+                //         },
+                //         icon: Icon(
+                //           Icons.list,
+                //           size: 20.sp,
+                //           color: !_isTableView ? Colors.white : Colors.grey.shade700,
+                //         ),
+                //         color: !_isTableView ? AppColors.primaryColor : Colors.transparent,
+                //         padding: EdgeInsets.symmetric(horizontal: 8.w),
+                //         constraints: BoxConstraints(minWidth: 36.w, minHeight: 36.h),
+                //         tooltip: 'List View',
+                //       ),
+                //     ],
+                //   ),
+                // ),
               ],
             ),
             SizedBox(height: 16.h),
 
-            /// Product List
+            /// ===========================================> Product List
             Expanded(
               child: Obx(() {
                 if (productListController.productListLoading.value) {
@@ -173,108 +173,139 @@ class _ProductListScreenState extends State<ProductListScreen> {
                 }
 
                 if (_isTableView) {
-                  // Table View
+                  // Table View with horizontal scrolling
                   return SingleChildScrollView(
                     scrollDirection: Axis.vertical,
-                    child: DataTable(
-                      headingRowColor: MaterialStateProperty.all(AppColors.primaryColor),
-                      dataRowColor: MaterialStateProperty.resolveWith<Color?>(
-                        (Set<MaterialState> states) {
-                          if (states.contains(MaterialState.selected)) {
-                            return AppColors.primaryColor.withOpacity(0.1);
-                          }
-                          return null; // Use default value
-                        },
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: DataTable(
+                        columnSpacing: 16.w, // Add spacing between columns
+                        headingRowColor: MaterialStateProperty.all(AppColors.primaryColor),
+                        dataRowColor: MaterialStateProperty.resolveWith<Color?>(
+                          (Set<MaterialState> states) {
+                            if (states.contains(MaterialState.selected)) {
+                              return AppColors.primaryColor.withOpacity(0.1);
+                            }
+                            return null; // Use default value
+                          },
+                        ),
+                        columns: const [
+                          DataColumn(
+                            label: Text(
+                              'ID',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          DataColumn(
+                            label: Text(
+                              'Product Name',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          DataColumn(
+                            label: Text(
+                              'Mrp Price',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+
+                          DataColumn(
+                            label: Text(
+                              'Tp Price',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ],
+                        rows: filteredProducts.map((product) {
+                          return DataRow(
+                            cells: [
+                              DataCell(
+                                Container(
+                                  constraints: BoxConstraints(
+                                    maxWidth: 60.w, // Limit width for ID
+                                  ),
+                                  child: Text(
+                                    '${product.id ?? 'N/A'}',
+                                    style: TextStyle(
+                                      fontSize: 14.sp,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.grey.shade800,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ),
+                              DataCell(
+                                Container(
+                                  constraints: BoxConstraints(
+                                    maxWidth: 150.w, // Limit width for product name
+                                  ),
+                                  child: Text(
+                                    product.productName ?? 'N/A',
+                                    style: TextStyle(
+                                      fontSize: 14.sp,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.grey.shade800,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ),
+                              DataCell(
+                                Container(
+                                  constraints: BoxConstraints(
+                                    maxWidth: 100.w, // Limit width for MRP price
+                                  ),
+                                  child: Text(
+                                    product.productMrp ?? 'N/A',
+                                    style: TextStyle(
+                                      fontSize: 14.sp,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.grey.shade800,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ),
+                              DataCell(
+                                Container(
+                                  constraints: BoxConstraints(
+                                    maxWidth: 100.w, // Limit width for TP price
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        product.dealerPrice ?? 'N/A',
+                                        style: TextStyle(
+                                          fontSize: 14.sp,
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.grey.shade800,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          );
+                        }).toList(),
                       ),
-                      columns: const [
-                        DataColumn(
-                          label: Text(
-                            'ID',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                        DataColumn(
-                          label: Text(
-                            'Product Name',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                        DataColumn(
-                          label: Text(
-                            'Actions',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ],
-                      rows: filteredProducts.map((product) {
-                        return DataRow(
-                          cells: [
-                            DataCell(
-                              Text(
-                                '${product.id ?? 'N/A'}',
-                                style: TextStyle(
-                                  fontSize: 14.sp,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.grey.shade800,
-                                ),
-                              ),
-                            ),
-                            DataCell(
-                              Text(
-                                product.productName ?? 'N/A',
-                                style: TextStyle(
-                                  fontSize: 14.sp,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.grey.shade800,
-                                ),
-                              ),
-                            ),
-                            DataCell(
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  IconButton(
-                                    onPressed: () {
-                                      // Add edit functionality
-                                    },
-                                    icon: Icon(
-                                      Icons.edit,
-                                      color: AppColors.primaryColor,
-                                      size: 18.sp,
-                                    ),
-                                    padding: EdgeInsets.zero,
-                                    constraints: BoxConstraints(minWidth: 28.w, minHeight: 28.h),
-                                    tooltip: 'Edit',
-                                  ),
-                                  IconButton(
-                                    onPressed: () {
-                                      // Add delete functionality
-                                    },
-                                    icon: Icon(
-                                      Icons.delete,
-                                      color: Colors.red,
-                                      size: 18.sp,
-                                    ),
-                                    padding: EdgeInsets.zero,
-                                    constraints: BoxConstraints(minWidth: 28.w, minHeight: 28.h),
-                                    tooltip: 'Delete',
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        );
-                      }).toList(),
                     ),
                   );
                 } else {
@@ -326,40 +357,40 @@ class _ProductListScreenState extends State<ProductListScreen> {
                                   ),
                                 ),
                               ),
-                              Expanded(
-                                flex: 3,
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    IconButton(
-                                      onPressed: () {
-                                        // Add edit functionality
-                                      },
-                                      icon: Icon(
-                                        Icons.edit,
-                                        color: AppColors.primaryColor,
-                                        size: 20.sp,
-                                      ),
-                                      padding: EdgeInsets.zero,
-                                      constraints: BoxConstraints(minWidth: 32.w, minHeight: 32.h),
-                                      tooltip: 'Edit',
-                                    ),
-                                    IconButton(
-                                      onPressed: () {
-                                        // Add delete functionality
-                                      },
-                                      icon: Icon(
-                                        Icons.delete,
-                                        color: Colors.red,
-                                        size: 20.sp,
-                                      ),
-                                      padding: EdgeInsets.zero,
-                                      constraints: BoxConstraints(minWidth: 32.w, minHeight: 32.h),
-                                      tooltip: 'Delete',
-                                    ),
-                                  ],
-                                ),
-                              ),
+                              // Expanded(
+                              //   flex: 3,
+                              //   child: Row(
+                              //     mainAxisAlignment: MainAxisAlignment.end,
+                              //     children: [
+                              //       IconButton(
+                              //         onPressed: () {
+                              //           // Add edit functionality
+                              //         },
+                              //         icon: Icon(
+                              //           Icons.edit,
+                              //           color: AppColors.primaryColor,
+                              //           size: 20.sp,
+                              //         ),
+                              //         padding: EdgeInsets.zero,
+                              //         constraints: BoxConstraints(minWidth: 32.w, minHeight: 32.h),
+                              //         tooltip: 'Edit',
+                              //       ),
+                              //       IconButton(
+                              //         onPressed: () {
+                              //           // Add delete functionality
+                              //         },
+                              //         icon: Icon(
+                              //           Icons.delete,
+                              //           color: Colors.red,
+                              //           size: 20.sp,
+                              //         ),
+                              //         padding: EdgeInsets.zero,
+                              //         constraints: BoxConstraints(minWidth: 32.w, minHeight: 32.h),
+                              //         tooltip: 'Delete',
+                              //       ),
+                              //     ],
+                              //   ),
+                              // ),
                             ],
                           ),
                           children: [
@@ -397,7 +428,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
             
             SizedBox(height: 8.h),
             
-            /// Product Count
+            ///==================================================>  Product Count
             Obx(() {
               final allProducts = productListController.productList.value.productInfo ?? [];
               final filteredProducts = _searchQuery.isEmpty

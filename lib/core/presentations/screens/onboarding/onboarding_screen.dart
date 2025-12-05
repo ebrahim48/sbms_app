@@ -82,7 +82,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
               mainAxisSize: MainAxisSize.min,
               children: [
                 SizedBox(height: 170.h),
-                Assets.images.onboarding.image(
+                Assets.images.logored.image(
                   width: 322.w,
                   height: 301.h,
                 ),
@@ -104,7 +104,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                   child: CustomButton(
                       title: AppString.start,
                       onpress: () {
-                        context.pushNamed(AppRoutes.onBoardingStartScreen);
+                        context.pushNamed(AppRoutes.logInScreen);
                       },
 
                   ),

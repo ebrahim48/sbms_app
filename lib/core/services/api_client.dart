@@ -1,17 +1,13 @@
 import 'dart:convert';
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get_connect/http/src/request/request.dart';
 import 'package:get/get_connect/http/src/response/response.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_disposable.dart';
 import 'package:http/http.dart' as http;
-import 'package:http_parser/http_parser.dart';
-import 'package:mime_type/mime_type.dart';
 import '../app_constants/app_constants.dart';
 import '../helpers/prefs_helper.dart';
 import 'api_constants.dart';
 import 'error_response.dart';
-import 'package:mime/mime.dart';
 
 
 class ApiClient extends GetxService {
@@ -27,7 +23,7 @@ class ApiClient extends GetxService {
 
     var mainHeaders = {
       'Content-Type': 'application/json',
-      'Authorization': bearerToken
+      'Authorization': bearerToken.startsWith('Bearer ') ? bearerToken : 'Bearer $bearerToken'
     };
     try {
       debugPrint('====> API Call: $uri\nHeader: ${headers ?? mainHeaders}');
@@ -51,7 +47,7 @@ class ApiClient extends GetxService {
     var mainHeaders = {
       'Accept': 'application/json', // ✅ recommended to include
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer $bearerToken', // ✅ proper format
+      'Authorization': bearerToken.startsWith('Bearer ') ? bearerToken : 'Bearer $bearerToken',
     };
 
     try {

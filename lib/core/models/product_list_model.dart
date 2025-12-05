@@ -23,19 +23,27 @@ class ProductListModel {
 class ProductInfo {
   final int? id;
   final String? productName;
+  final String? dealerPrice;
+  final String? productMrp;
 
   ProductInfo({
     this.id,
     this.productName,
+    this.dealerPrice,
+    this.productMrp,
   });
 
   factory ProductInfo.fromJson(Map<String, dynamic> json) => ProductInfo(
     id: json["id"],
     productName: json["product_name"],
+    dealerPrice: json["dealer_price"],
+    productMrp: json["product_mrp"],
   );
 
   Map<String, dynamic> toJson() => {
     "id": id,
     "product_name": productName,
+    "dealer_price": dealerPrice,
+    "product_mrp": productMrp,
   };
 }
