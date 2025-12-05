@@ -6,7 +6,7 @@ class ApiConstants{
 
 
 
-  static const String loginUpEndPoint = "/auth/login";
+  static const String loginEndPoint = "/api/v2/login";
 
 
 

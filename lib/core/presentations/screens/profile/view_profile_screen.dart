@@ -25,11 +25,11 @@ class ViewProfileScreen extends StatelessWidget {
         titleSpacing: 0,
         title: Row(
           children: [
-            IconButton(
-              padding: EdgeInsets.zero,
-              icon: Icon(Icons.arrow_back, color: Colors.black, size: 24.r),
-              onPressed: () => Navigator.pop(context),
-            ),
+            // IconButton(
+            //   padding: EdgeInsets.zero,
+            //   icon: Icon(Icons.arrow_back, color: Colors.black, size: 24.r),
+            //   onPressed: () => Navigator.pop(context),
+            // ),
             SizedBox(width: 12.w),
             CustomText(
               text: "View Profile",

@@ -6,6 +6,7 @@ import 'package:sbms_apps/core/presentations/screens/home/sales_list_screen.dart
 
 import '../../../../global/custom_assets/assets.gen.dart';
 import '../../../constants/app_colors.dart';
+import '../../../helpers/auth_helper.dart';
 import '../profile/view_profile_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -18,8 +19,8 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
 
-  final List<Widget> _screens = [
-    _HomeContent(),
+  late final List<Widget> _screens = [
+    _HomeContent(logoutCallback: () => _handleLogout()),
     const SalesListScreen(),
     ViewProfileScreen(),
   ];
@@ -42,7 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(
               icon: Icon(Icons.list_alt),
-              label: 'Sales List'),
+              label: 'Order List'),
           BottomNavigationBarItem(
               icon: Icon(Icons.person),
               label: 'Profile'),
@@ -50,10 +51,43 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+
+  void _handleLogout() async {
+    // Show confirmation dialog
+    bool confirmed = await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Confirm Logout'),
+        content: const Text('Are you sure you want to logout?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Logout'),
+          ),
+        ],
+      ),
+    ) ?? false;
+
+    if (confirmed) {
+      await AuthHelper.logout();
+      // Navigate back to login screen using GoRouter
+      if (mounted) {
+        GoRouter.of(context).goNamed(AppRoutes.logInScreen);
+      }
+    }
+  }
 }
 
 // Extract the original home content to a separate widget
 class _HomeContent extends StatelessWidget {
+  final VoidCallback logoutCallback;
+
+  const _HomeContent({required this.logoutCallback});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -100,7 +134,7 @@ class _HomeContent extends StatelessWidget {
                 ),
                 _buildMenuButton(
                   icon: Icons.add_shopping_cart,
-                  title: "Sales",
+                  title: "Order List",
                   onTap: () {
                     context.pushNamed(AppRoutes.salesListScreen);
 
@@ -109,7 +143,7 @@ class _HomeContent extends StatelessWidget {
 
                 _buildMenuButton(
                   icon: Icons.receipt_long,
-                  title: "Order List",
+                  title: "Order Create",
                   onTap: () {
                     context.pushNamed(AppRoutes.orderListScreen);
                   },
@@ -123,7 +157,7 @@ class _HomeContent extends StatelessWidget {
               children: [
                 _buildMenuButton(
                   icon: Icons.comment_bank_outlined,
-                  title: "Bank",
+                  title: "Bank List",
                   onTap: () {
                     context.pushNamed(AppRoutes.bankReceiveListScreen);
                   },
@@ -209,7 +243,7 @@ class _HomeContent extends StatelessWidget {
           _buildDrawerItem(
             icon: Icons.logout,
             text: "Logout",
-            onTap: () {},
+            onTap: logoutCallback,
           ),
 
         ],

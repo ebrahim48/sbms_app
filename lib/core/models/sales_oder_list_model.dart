@@ -18,6 +18,7 @@ class SalesOrderListModel {
   final int? orderStatus;
   final String? orderStatusText;
   final String? totalQty;
+  final String? totalDiscount;
   final String? grandTotal;
   final dynamic dealerType;
   final String? narration;
@@ -33,6 +34,7 @@ class SalesOrderListModel {
     this.orderStatus,
     this.orderStatusText,
     this.totalQty,
+    this.totalDiscount,
     this.grandTotal,
     this.dealerType,
     this.narration,
@@ -49,6 +51,7 @@ class SalesOrderListModel {
     orderStatus: json["order_status"],
     orderStatusText: json["order_status_text"],
     totalQty: json["total_qty"],
+    totalDiscount: json["total_discount"],
     grandTotal: json["grand_total"],
     dealerType: json["dealer_type"],
     narration: json["narration"],
@@ -65,6 +68,7 @@ class SalesOrderListModel {
     "order_status": orderStatus,
     "order_status_text": orderStatusText,
     "total_qty": totalQty,
+    "total_discount": totalDiscount,
     "grand_total": grandTotal,
     "dealer_type": dealerType,
     "narration": narration,

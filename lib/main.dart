@@ -8,6 +8,7 @@ import 'core/config/app_routes/app_routes.dart';
 import 'core/config/app_themes/app_themes.dart';
 import 'core/helpers/dependancy_injaction.dart';
 import 'core/presentations/controller/theme_controller.dart';
+import 'core/helpers/auth_helper.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,6 +19,7 @@ void main() async {
   di.lockDevicePortrait();
 
   Get.put(ThemeController());
+
   runApp(
     DevicePreview(
 

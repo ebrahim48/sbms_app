@@ -30,7 +30,7 @@ class _SalesListScreenState extends State<SalesListScreen> {
       appBar: AppBar(
         backgroundColor: AppColors.primaryColor,
         title: const Text(
-          "Sales List",
+          "Order List",
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
@@ -113,9 +113,10 @@ class _SalesListScreenState extends State<SalesListScreen> {
                     _buildInfoRow("Vendor", data.dealerName ?? "N/A"),
                     _buildInfoRow("Warehouse", data.warehouseName ?? "N/A"),
                     _buildInfoRow("Order Date", data.orderDate ?? "N/A"),
-                    _buildInfoRow("Created At", data.createdAt ?? "N/A"),
+                    _buildInfoRow("Created At", _extractTimeOnly(data.createdAt) ?? "N/A"),
                     _buildInfoRow("Total Quantity", data.totalQty ?? "0"),
-                    _buildInfoRow("Total Dealer Type", data.dealerType ?? "0"),
+                    _buildInfoRow("Total Discount", data.totalDiscount ?? "N/A"),
+                    _buildInfoRow("Total Dealer Type", data.dealerType ?? "N/A"),
                     _buildInfoRow("Narration", data.narration ?? "N/A"),
                     _buildInfoRow(
                       "Grand Total",
@@ -131,6 +132,46 @@ class _SalesListScreenState extends State<SalesListScreen> {
         );
       }),
     );
+  }
+
+  // Method to extract time only from datetime string
+  String? _extractTimeOnly(String? dateTimeString) {
+    if (dateTimeString == null || dateTimeString.isEmpty) return null;
+
+    // Handle different datetime formats, including AM/PM format
+    try {
+      // If it's in a format with AM/PM, extract the time part
+      if (dateTimeString.contains(RegExp(r'\d{2}:\d{2}\s?(AM|PM|am|pm)'))) {
+        // Extract time with AM/PM using regex
+        RegExp regExp = RegExp(r'(\d{1,2}:\d{2}\s*(AM|PM|am|pm))');
+        Match? match = regExp.firstMatch(dateTimeString);
+        if (match != null) {
+          return match.group(0)?.trim();
+        }
+      }
+      // Try to parse as regular datetime string
+      else {
+        DateTime dateTime = DateTime.parse(dateTimeString);
+        // Extract only the time part in HH:MM format
+        String timeOnly = "${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}";
+        return timeOnly;
+      }
+    } catch (e) {
+      // If parsing fails, try extracting time using regex as fallback
+      try {
+        // Try to find any time pattern in the string
+        RegExp regExp = RegExp(r'(\d{1,2}:\d{2}(:\d{2})?\s*(AM|PM|am|pm)?)');
+        Match? match = regExp.firstMatch(dateTimeString);
+        if (match != null) {
+          return match.group(0)?.trim();
+        }
+      } catch (e2) {
+        // If all attempts fail, return original
+      }
+    }
+
+    // If all attempts fail, return original string
+    return dateTimeString;
   }
 
   Widget _buildInfoRow(String label, String value,
