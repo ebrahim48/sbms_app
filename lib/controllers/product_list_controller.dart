@@ -188,6 +188,7 @@ class ProductListController extends GetxController {
     String? narration,
     required List<int> discount,
     required List<int> bonus,
+    required String dealerType,
     required BuildContext context,
   }) async {
     var body = {
@@ -204,6 +205,7 @@ class ProductListController extends GetxController {
       "narration": narration ?? "",
       "discount": discount,
       "bonus": bonus,
+      "dealer_type": dealerType,
     };
 
     orderLoading(true);

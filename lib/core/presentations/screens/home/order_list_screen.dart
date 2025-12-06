@@ -980,7 +980,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
                           debugPrint('Warehouse ID: $_warehouseId');
                           debugPrint('Product IDs: $productIds');
 
-                          // 🚀 Final API call
+                          // 🚀 Final API call - pass the selected dealer type string directly
                           productListController.orderCreateInfo(
                             date: formattedDate,
                             dealerId: _vendorId!,
@@ -996,6 +996,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
                             context: context,
                             discount: discountValues,
                             bonus: bonusValues,
+                            dealerType: _dealerType ?? 'Cash Dealer' // Pass the selected string value directly
                           );
                         }
                       }
