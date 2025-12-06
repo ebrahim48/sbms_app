@@ -413,7 +413,7 @@ class _CreateScreenState extends State<CreateScreen> {
                 validator: (value) => value == null ? "Select category" : null,
               );
             }),
-            SizedBox(height: 12.h),
+            SizedBox(height: 16.h),
 
             /// Balance Type & Invoice Row
             Row(
@@ -533,7 +533,7 @@ class _CreateScreenState extends State<CreateScreen> {
                 // ),
               ],
             ),
-            SizedBox(height: 12.h),
+            SizedBox(height: 16.h),
 
             /// Bank Charge & Amount Row
             Row(
