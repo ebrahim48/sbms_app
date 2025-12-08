@@ -4,6 +4,8 @@ import 'package:get/get.dart';
 import 'package:sbms_apps/core/presentations/widgets/custom_loader.dart';
 import '../../../../controllers/sales_order_list_controller.dart';
 import '../../../constants/app_colors.dart';
+import '../../widgets/custom_text.dart';
+import '../../../models/sales_invoice_list_model.dart';
 
 class SalesListScreen extends StatefulWidget {
   const SalesListScreen({super.key});
@@ -79,6 +81,13 @@ class _SalesListScreenState extends State<SalesListScreen> {
                             fontSize: 14.sp,
                           ),
                         ),
+                        SizedBox(width: 12,),
+                        InkWell(
+                          onTap: () => _showInvoiceDetails(data.invoiceNo ?? ""),
+                          child: CustomText(text: 'View',
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.textColor1A1A1A,),
+                        ),
                         Container(
                           padding: EdgeInsets.symmetric(
                               horizontal: 10.w, vertical: 4.h),
@@ -104,8 +113,10 @@ class _SalesListScreenState extends State<SalesListScreen> {
                             ),
                           ),
                         ),
+
                       ],
                     ),
+
 
                     SizedBox(height: 10.h),
 
@@ -116,6 +127,7 @@ class _SalesListScreenState extends State<SalesListScreen> {
                     _buildInfoRow("Created At", _extractTimeOnly(data.createdAt) ?? "N/A"),
                     _buildInfoRow("Total Quantity", data.totalQty ?? "0"),
                     _buildInfoRow("Total Discount", data.totalDiscount ?? "N/A"),
+                    _buildInfoRow("Total Bonus", data.totalBonus ?? "N/A"),
                     _buildInfoRow("Total Dealer Type", data.dealerType ?? "N/A"),
                     _buildInfoRow("Narration", data.narration ?? "N/A"),
                     _buildInfoRow(
@@ -199,6 +211,217 @@ class _SalesListScreenState extends State<SalesListScreen> {
                 fontWeight: bold ? FontWeight.bold : FontWeight.w500,
                 fontSize: 12.sp,
                 color: valueColor ?? Colors.black,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _showInvoiceDetails(String invoiceNo) async {
+    // Show a loading dialog while fetching data
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const CustomLoader(),
+              SizedBox(width: 16.w),
+              const Text("Loading invoice details..."),
+            ],
+          ),
+        );
+      },
+    );
+
+    // Fetch the invoice details
+    final invoiceData = await salesOrderListController.getSalesInvoiceList(invoiceNo);
+
+    // Close the loading dialog
+    Navigator.of(context).pop();
+
+    if (invoiceData != null) {
+      // Show the invoice details popup
+      _showInvoiceDetailsPopup(invoiceData);
+    } else {
+      // Show error message
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text("Error"),
+            content: const Text("Could not load invoice details."),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text("OK"),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
+  void _showInvoiceDetailsPopup(SalesInvoiceListModel invoiceData) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Invoice Details - ${invoiceData.invoice?.invoiceNo ?? 'N/A'}"),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Company Information
+                  Text(
+                    "Company Information",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16.sp,
+                    ),
+                  ),
+                  _buildPopupInfoRow("Name", invoiceData.company?.name ?? "N/A"),
+                  _buildPopupInfoRow("Address", invoiceData.company?.address ?? "N/A"),
+                  _buildPopupInfoRow("Phone", invoiceData.company?.phone ?? "N/A"),
+                  _buildPopupInfoRow("Email", invoiceData.company?.email ?? "N/A"),
+                  SizedBox(height: 16.h),
+
+                  // Invoice Information
+                  Text(
+                    "Invoice Information",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16.sp,
+                    ),
+                  ),
+                  _buildPopupInfoRow("Invoice No", invoiceData.invoice?.invoiceNo ?? "N/A"),
+                  _buildPopupInfoRow("Invoice Date", invoiceData.invoice?.invoiceDate ?? "N/A"),
+                  _buildPopupInfoRow("Item Type", invoiceData.invoice?.itemType ?? "N/A"),
+                  _buildPopupInfoRow("Transport Cost", invoiceData.invoice?.transportCost?.toString() ?? "N/A"),
+                  _buildPopupInfoRow("Narration", invoiceData.invoice?.narration ?? "N/A"),
+                  _buildPopupInfoRow("Created By", invoiceData.invoice?.createdBy ?? "N/A"),
+                  _buildPopupInfoRow("Current Time", invoiceData.invoice?.currentTime ?? "N/A"),
+                  SizedBox(height: 16.h),
+
+                  // Dealer Information
+                  Text(
+                    "Dealer Information",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16.sp,
+                    ),
+                  ),
+                  _buildPopupInfoRow("Name", invoiceData.dealer?.name ?? "N/A"),
+                  _buildPopupInfoRow("Code", invoiceData.dealer?.code ?? "N/A"),
+                  _buildPopupInfoRow("Type", invoiceData.dealer?.type ?? "N/A"),
+                  _buildPopupInfoRow("Address", invoiceData.dealer?.address ?? "N/A"),
+                  _buildPopupInfoRow("Warehouse", invoiceData.dealer?.warehouse ?? "N/A"),
+                  _buildPopupInfoRow("Territory", invoiceData.dealer?.territory ?? "N/A"),
+                  _buildPopupInfoRow("Employee", invoiceData.dealer?.employee ?? "N/A"),
+                  SizedBox(height: 16.h),
+
+                  // Financial Information
+                  Text(
+                    "Financial Information",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16.sp,
+                    ),
+                  ),
+                  _buildPopupInfoRow("Opening Balance", invoiceData.financial?.openingBalance ?? "N/A"),
+                  _buildPopupInfoRow("Current Invoice Value", invoiceData.financial?.currentInvoiceValue ?? "N/A"),
+                  _buildPopupInfoRow("Current Balance", invoiceData.financial?.currentBalance ?? "N/A"),
+                  _buildPopupInfoRow("Last Payment", invoiceData.financial?.lastPayment?.toString() ?? "N/A"),
+                  _buildPopupInfoRow("Total Value", invoiceData.financial?.totalValue ?? "N/A"),
+                  _buildPopupInfoRow("Commission", invoiceData.financial?.commission ?? "N/A"),
+                  _buildPopupInfoRow("Payable", invoiceData.financial?.payable ?? "N/A"),
+                  _buildPopupInfoRow("Payable in Words", invoiceData.financial?.payableInWords ?? "N/A"),
+
+
+
+                  SizedBox(height: 16.h),
+
+                  // Product Items Information
+                  Text(
+                    "Product Items Information",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16.sp,
+                    ),
+                  ),
+                  // Check if items list is not empty
+                  if (invoiceData.items != null && invoiceData.items!.isNotEmpty)
+                    ...invoiceData.items!.map((item) => Column(
+                          children: [
+                            _buildPopupInfoRow("ID", item.id?.toString() ?? "N/A"),
+                            _buildPopupInfoRow("Product Name", item.productName ?? "N/A"),
+                            _buildPopupInfoRow("Unit Price", item.unitPrice ?? "N/A"),
+                            _buildPopupInfoRow("Quantity", item.qty ?? "N/A"),
+                            _buildPopupInfoRow("Weight", "${item.weight ?? 0} ${item.weightUnit ?? ''}"),
+                            _buildPopupInfoRow("Unit Name", item.unitName ?? "N/A"),
+                            _buildPopupInfoRow("Bonus", item.bonus?.toString() ?? "N/A"),
+                            _buildPopupInfoRow("Discount %", "${item.discountPercentage ?? 0}%"),
+                            _buildPopupInfoRow("Discount Amount", item.discountAmount ?? "N/A"),
+                            _buildPopupInfoRow("Total Price", item.totalPrice ?? "N/A"),
+                            Divider(height: 12.h),
+                          ],
+                        )).toList()
+                  else
+                    _buildPopupInfoRow("Items", "No items found"),
+
+
+                ],
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text("Close"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // Helper method to build info rows in popup
+  Widget _buildPopupInfoRow(String label, String value) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 2.h),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 120.w,
+            child: Text(
+              "$label:",
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 12.sp,
+                color: Colors.grey.shade700,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: TextStyle(
+                fontWeight: FontWeight.w500,
+                fontSize: 12.sp,
+                color: Colors.black,
               ),
             ),
           ),
