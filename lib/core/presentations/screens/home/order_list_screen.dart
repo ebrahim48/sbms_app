@@ -884,20 +884,20 @@ class _OrderListScreenState extends State<OrderListScreen> {
                   labelText: "Narration",
                   border: OutlineInputBorder(),
                 ),
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return "Narration cannot be empty";
-                  }
-                  if (value.length > 255) {
-                    return "Narration cannot exceed 255 characters";
-                  }
-                  // Optional: Allow only letters, numbers, basic punctuation
-                  final validPattern = RegExp(r'^[a-zA-Z0-9\s.,!?()-]*$');
-                  if (!validPattern.hasMatch(value)) {
-                    return "Invalid characters in narration";
-                  }
-                  return null; // Valid
-                },
+                // validator: (value) {
+                //   if (value == null || value.trim().isEmpty) {
+                //     return "Narration cannot be empty";
+                //   }
+                //   if (value.length > 255) {
+                //     return "Narration cannot exceed 255 characters";
+                //   }
+                //   // Optional: Allow only letters, numbers, basic punctuation
+                //   final validPattern = RegExp(r'^[a-zA-Z0-9\s.,!?()-]*$');
+                //   if (!validPattern.hasMatch(value)) {
+                //     return "Invalid characters in narration";
+                //   }
+                //   return null; // Valid
+                // },
               ),
 
               SizedBox(height: 16.h),

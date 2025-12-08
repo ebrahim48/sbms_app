@@ -18,6 +18,7 @@ class ApiConstants{
   static const String orderCreateEndPoint = "/api/v2/order-store";
   static const String bankReceiveEndPoint = "/api/v2/payment-receive-store";
   static const String getSalesOrderListEndPoint = "/api/v2/sales-order-list";
+  static String getSalesInvoiceListEndPoint(String invoiceNo) => "/api/v2/sales-order-invoice/$invoiceNo";
   static const String getBankListEndPoint = "/api/v2/get-bank-list";
   static const String getCategoryListEndPoint = "/api/v2/get-product-category-list";
   static const String getDealerInvoiceListEndPoint = "/api/v2/get-dealer-wise-invoice-list/52";
