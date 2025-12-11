@@ -95,7 +95,7 @@ class _HomeContent extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: AppColors.primaryColor,
         title: const Text(
-          "SBMS APPS",
+          "UAI APPS",
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
@@ -197,15 +197,15 @@ class _HomeContent extends StatelessWidget {
                   backgroundColor: Colors.white,
                   child: Padding(
                     padding: EdgeInsets.all(6.r),
-                    child:  Assets.images.logo.image(
-                      width: 32.w,
-                      height: 32.h,
+                    child:  Assets.images.logo4.image(
+                      width: 42.w,
+                      height: 42.h,
                     ),
                   ),
                 ),
                 SizedBox(height: 10.h),
                 Text(
-                  "Welcome to SBMS",
+                  "Welcome to UAI",
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 16.sp,

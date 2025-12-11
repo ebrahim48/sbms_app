@@ -72,6 +72,7 @@ class Dealer {
   final String? warehouse;
   final String? territory;
   final String? employee;
+  final int? dealerCreditDuration;
 
   Dealer({
     this.name,
@@ -81,6 +82,7 @@ class Dealer {
     this.warehouse,
     this.territory,
     this.employee,
+    this.dealerCreditDuration
   });
 
   factory Dealer.fromJson(Map<String, dynamic> json) => Dealer(
@@ -91,6 +93,7 @@ class Dealer {
     warehouse: json["warehouse"],
     territory: json["territory"],
     employee: json["employee"],
+    dealerCreditDuration: json["dealer_credit_duration"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -101,6 +104,7 @@ class Dealer {
     "warehouse": warehouse,
     "territory": territory,
     "employee": employee,
+    "dealer_credit_duration": dealerCreditDuration,
   };
 }
 

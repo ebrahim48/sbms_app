@@ -128,7 +128,8 @@ class _SalesListScreenState extends State<SalesListScreen> {
                     _buildInfoRow("Total Quantity", data.totalQty ?? "0"),
                     _buildInfoRow("Total Discount", data.totalDiscount ?? "N/A"),
                     _buildInfoRow("Total Bonus", data.totalBonus ?? "N/A"),
-                    _buildInfoRow("Total Dealer Type", data.dealerType ?? "N/A"),
+                    _buildInfoRow("Dealer Type", data.dealerType ?? "N/A"),
+                    _buildInfoRow("Dealer Duration", data.dealerCreditDuration?.toString() ?? "N/A"),
                     _buildInfoRow("Narration", data.narration ?? "N/A"),
                     _buildInfoRow(
                       "Grand Total",
@@ -328,6 +329,7 @@ class _SalesListScreenState extends State<SalesListScreen> {
                   _buildPopupInfoRow("Warehouse", invoiceData.dealer?.warehouse ?? "N/A"),
                   _buildPopupInfoRow("Territory", invoiceData.dealer?.territory ?? "N/A"),
                   _buildPopupInfoRow("Employee", invoiceData.dealer?.employee ?? "N/A"),
+                  _buildPopupInfoRow("Dealer Duration", invoiceData.dealer?.dealerCreditDuration.toString() ?? "N/A"),
                   SizedBox(height: 16.h),
 
                   // Financial Information

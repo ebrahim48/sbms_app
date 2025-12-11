@@ -86,18 +86,19 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                   width: 322.w,
                   height: 301.h,
                 ),
-                SizedBox(height: 58.h),
+                SizedBox(height: 12.h),
+                CustomText(
+                  text: AppString.starting,
+                  maxline: 2,
+                ),
+                SizedBox(height: 15.h),
                 CustomText(
                   text: AppString.welcomeLimitIt,
                   fontsize: 24.sp,
                   fontWeight: FontWeight.w700,
                   color: AppColors.primaryColor,
                 ),
-                SizedBox(height: 12.h),
-                CustomText(
-                  text: AppString.starting,
-                  maxline: 2,
-                ),
+
                 SizedBox(height: 32.h),
                 Padding(
                   padding:  EdgeInsets.symmetric(vertical: 20,horizontal: 20),
