@@ -133,9 +133,17 @@ class _ProductListScreenState extends State<ProductListScreen> {
 
                 // Filter products based on search query
                 final allProducts = productListController.productList.value.productInfo ?? [];
+                final unfilteredProducts = [...allProducts]; // Create a copy to avoid modifying original
+                // Sort unfiltered products alphabetically by product name
+                unfilteredProducts.sort((a, b) {
+                  final nameA = a?.productName?.toLowerCase() ?? '';
+                  final nameB = b?.productName?.toLowerCase() ?? '';
+                  return nameA.compareTo(nameB);
+                });
+
                 final filteredProducts = _searchQuery.isEmpty
-                    ? allProducts
-                    : allProducts.where((product) {
+                    ? unfilteredProducts
+                    : unfilteredProducts.where((product) {
                   final productName = product?.productName?.toLowerCase() ?? '';
                   final productId = product?.id?.toString().toLowerCase() ?? '';
                   final query = _searchQuery.toLowerCase();

@@ -16,6 +16,7 @@ class SalesOrderListModel {
   final String? invoiceNo;
   final String? orderDate;
   final int? orderStatus;
+  final int? dealerCreditDuration;
   final String? orderStatusText;
   final String? totalQty;
   final String? totalDiscount;
@@ -30,6 +31,7 @@ class SalesOrderListModel {
     this.createdAt,
     this.dealerName,
     this.warehouseName,
+    this.dealerCreditDuration,
     this.invoiceNo,
     this.orderDate,
     this.orderStatus,
@@ -51,6 +53,7 @@ class SalesOrderListModel {
     invoiceNo: json["invoice_no"],
     orderDate: json["order_date"],
     orderStatus: json["order_status"],
+    dealerCreditDuration: json["dealer_credit_duration"],
     orderStatusText: json["order_status_text"],
     totalQty: json["total_qty"],
     totalDiscount: json["total_discount"],
@@ -75,6 +78,7 @@ class SalesOrderListModel {
     "grand_total": grandTotal,
     "dealer_type": dealerType,
     "narration": narration,
+    "dealer_credit_duration": dealerCreditDuration,
     "total_bonus": totalBonus,
   };
 }

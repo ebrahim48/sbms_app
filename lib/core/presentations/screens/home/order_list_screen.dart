@@ -55,6 +55,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
   final List<String> _types = ["Finished Goods"];
   String? _dealerType;
   final List<String> _dealerTypes = ["Cash Dealer", "Credit Dealer"];
+  int _dealerCreditDuration = 0;
 
 
   @override
@@ -296,6 +297,27 @@ class _OrderListScreenState extends State<OrderListScreen> {
                     ))
                         .toList(),
                     onChanged: (val) => setState(() => _dealerType = val),
+                  ),
+
+                  SizedBox(height: 16.h),
+                  /// =============================> Dealer Credit Duration ==========================>
+                  TextFormField(
+                    decoration: InputDecoration(
+                      labelText: "Dealer Credit Duration",
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                      contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+                    ),
+                    keyboardType: TextInputType.number,
+                    onChanged: (value) {
+                      setState(() {
+                        // Convert to int, default to 0 if invalid
+                        _dealerCreditDuration = int.tryParse(value) ?? 0;
+                      });
+                    },
                   ),
 
                 ],
@@ -986,6 +1008,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
                             dealerId: _vendorId!,
                             invoiceNo: productListController.invoiceNumber.value.invoiceNo?.toString() ?? 'N/A',
                             warehouseId: _warehouseId!,
+                            dealerCreditDuration: _dealerCreditDuration,
                             productId: productIds,
                             price: prices,
                             quantity: quantities,
@@ -997,6 +1020,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
                             discount: discountValues,
                             bonus: bonusValues,
                             dealerType: _dealerType ?? 'Cash Dealer' // Pass the selected string value directly
+
                           );
                         }
                       }
