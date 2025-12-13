@@ -296,29 +296,40 @@ class _OrderListScreenState extends State<OrderListScreen> {
                       child: Text(e),
                     ))
                         .toList(),
-                    onChanged: (val) => setState(() => _dealerType = val),
+                    onChanged: (val) {
+                      setState(() {
+                        _dealerType = val;
+                        // Reset duration when changing to Cash Dealer
+                        if (val == "Cash Dealer") {
+                          _dealerCreditDuration = 0;
+                        }
+                      });
+                    },
                   ),
 
                   SizedBox(height: 16.h),
                   /// =============================> Dealer Credit Duration ==========================>
-                  TextFormField(
-                    decoration: InputDecoration(
-                      labelText: "Dealer Credit Duration",
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
+                  if (_dealerType != "Cash Dealer") ...[
+                    TextFormField(
+                      decoration: InputDecoration(
+                        labelText: "Dealer Credit Duration (Days)",
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        filled: true,
+                        fillColor: Colors.white,
+                        contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
                       ),
-                      filled: true,
-                      fillColor: Colors.white,
-                      contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+                      keyboardType: TextInputType.number,
+                      onChanged: (value) {
+                        setState(() {
+                          // Convert to int, default to 0 if invalid
+                          _dealerCreditDuration = int.tryParse(value) ?? 0;
+                        });
+                      },
                     ),
-                    keyboardType: TextInputType.number,
-                    onChanged: (value) {
-                      setState(() {
-                        // Convert to int, default to 0 if invalid
-                        _dealerCreditDuration = int.tryParse(value) ?? 0;
-                      });
-                    },
-                  ),
+                    SizedBox(height: 16.h),
+                  ],
 
                 ],
               ),
@@ -809,6 +820,28 @@ class _OrderListScreenState extends State<OrderListScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
+                          "Gross receivable:",
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black87,
+                          ),
+                        ),
+                        Text(
+                          "৳ ${_calculateGrossReceivable().toStringAsFixed(2)}",
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primaryColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 8.h),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
                           "Discount amount:",
                           style: TextStyle(
                             fontSize: 14.sp,
@@ -831,7 +864,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          "Gross receivable:",
+                          "Net receivable amount:",
                           style: TextStyle(
                             fontSize: 14.sp,
                             fontWeight: FontWeight.w500,
@@ -839,11 +872,11 @@ class _OrderListScreenState extends State<OrderListScreen> {
                           ),
                         ),
                         Text(
-                          "৳ ${_calculateGrossReceivable().toStringAsFixed(2)}",
+                          "৳ ${_calculateGrandTotalWithDiscount()}",
                           style: TextStyle(
                             fontSize: 14.sp,
                             fontWeight: FontWeight.bold,
-                            color: AppColors.primaryColor,
+                            color: Colors.redAccent,
                           ),
                         ),
                       ],
@@ -870,12 +903,12 @@ class _OrderListScreenState extends State<OrderListScreen> {
                         ),
                       ],
                     ),
-                    SizedBox(height: 4.h),
+                    SizedBox(height: 8.h),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          "Net receivable amount:",
+                          "Total Bonus:",
                           style: TextStyle(
                             fontSize: 14.sp,
                             fontWeight: FontWeight.w500,
@@ -883,15 +916,16 @@ class _OrderListScreenState extends State<OrderListScreen> {
                           ),
                         ),
                         Text(
-                          "৳ ${_calculateGrandTotalWithDiscount()}",
+                          "${_calculateTotalBonus()}",
                           style: TextStyle(
                             fontSize: 14.sp,
                             fontWeight: FontWeight.bold,
-                            color: Colors.redAccent,
+                            color: AppColors.primaryColor,
                           ),
                         ),
                       ],
                     ),
+
                   ],
                 ),
               ),
@@ -1008,7 +1042,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
                             dealerId: _vendorId!,
                             invoiceNo: productListController.invoiceNumber.value.invoiceNo?.toString() ?? 'N/A',
                             warehouseId: _warehouseId!,
-                            dealerCreditDuration: _dealerCreditDuration,
+                            dealerCreditDuration: _dealerType == "Cash Dealer" ? 0 : _dealerCreditDuration,
                             productId: productIds,
                             price: prices,
                             quantity: quantities,
@@ -1039,7 +1073,13 @@ class _OrderListScreenState extends State<OrderListScreen> {
     if (!mounted) return;
 
     final products = (productListController.productList.value.productInfo ?? []);
-    List<dynamic> filteredProducts = List.from(products);
+    // Sort products by ID in ascending order
+    var sortedProducts = List.from(products)..sort((a, b) {
+      final idA = a?.id ?? 0;
+      final idB = b?.id ?? 0;
+      return idA.compareTo(idB);
+    });
+    List<dynamic> filteredProducts = List.from(sortedProducts);
     String searchQuery = '';
 
     await showDialog(
@@ -1061,11 +1101,17 @@ class _OrderListScreenState extends State<OrderListScreen> {
                     onChanged: (value) {
                       setState(() {
                         searchQuery = value.toLowerCase();
-                        filteredProducts = products.where((product) {
+                        filteredProducts = sortedProducts.where((product) {
                           final name = (product?.productName ?? '').toLowerCase();
                           final id = (product?.id?.toString() ?? '').toLowerCase();
                           return name.contains(searchQuery) || id.contains(searchQuery);
                         }).toList();
+                        // Sort the filtered results by ID
+                        filteredProducts.sort((a, b) {
+                          final idA = a?.id ?? 0;
+                          final idB = b?.id ?? 0;
+                          return idA.compareTo(idB);
+                        });
                       });
                     },
                   ),
@@ -1370,7 +1416,14 @@ class _OrderListScreenState extends State<OrderListScreen> {
     if (!mounted) return;
 
     final dealers = (productListController.dealerList.value.dealerInfo ?? []);
-    List<dynamic> filteredDealers = List.from(dealers);
+    // Sort all dealers alphabetically by name initially
+    List<dynamic> sortedDealers = List.from(dealers);
+    sortedDealers.sort((a, b) {
+      final nameA = (a.dealerName ?? '').toLowerCase();
+      final nameB = (b.dealerName ?? '').toLowerCase();
+      return nameA.compareTo(nameB);
+    });
+    List<dynamic> filteredDealers = List.from(sortedDealers);
     String searchQuery = '';
 
     await showDialog(
@@ -1397,6 +1450,12 @@ class _OrderListScreenState extends State<OrderListScreen> {
                           final id = (dealer.id?.toString() ?? '').toLowerCase();
                           return name.contains(searchQuery) || id.contains(searchQuery);
                         }).toList();
+                        // Sort the filtered dealers alphabetically by name
+                        filteredDealers.sort((a, b) {
+                          final nameA = (a.dealerName ?? '').toLowerCase();
+                          final nameB = (b.dealerName ?? '').toLowerCase();
+                          return nameA.compareTo(nameB);
+                        });
                       });
                     },
                   ),
@@ -1696,6 +1755,17 @@ class _OrderListScreenState extends State<OrderListScreen> {
     }
 
     return total;
+  }
+
+  // Method to calculate total bonus
+  int _calculateTotalBonus() {
+    int totalBonus = 0;
+
+    for (int i = 0; i < _selectedProductBonuses.length; i++) {
+      totalBonus += _selectedProductBonuses[i];
+    }
+
+    return totalBonus;
   }
 
 }

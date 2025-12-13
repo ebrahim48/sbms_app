@@ -145,9 +145,8 @@ class _ProductListScreenState extends State<ProductListScreen> {
                     ? unfilteredProducts
                     : unfilteredProducts.where((product) {
                   final productName = product?.productName?.toLowerCase() ?? '';
-                  final productId = product?.id?.toString().toLowerCase() ?? '';
                   final query = _searchQuery.toLowerCase();
-                  return productName.contains(query) || productId.contains(query);
+                  return productName.contains(query);
                 }).toList();
 
                 if (filteredProducts.isEmpty) {
@@ -200,7 +199,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
                         columns: const [
                           DataColumn(
                             label: Text(
-                              'ID',
+                              'Serial',
                               style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
@@ -238,16 +237,19 @@ class _ProductListScreenState extends State<ProductListScreen> {
                             ),
                           ),
                         ],
-                        rows: filteredProducts.map((product) {
+                        rows: filteredProducts.asMap().entries.map((entry) {
+                          int index = entry.key;
+                          var product = entry.value;
+                          int serialNumber = index + 1;
                           return DataRow(
                             cells: [
                               DataCell(
                                 Container(
                                   constraints: BoxConstraints(
-                                    maxWidth: 60.w, // Limit width for ID
+                                    maxWidth: 60.w, // Limit width for Serial
                                   ),
                                   child: Text(
-                                    '${product.id ?? 'N/A'}',
+                                    '$serialNumber',
                                     style: TextStyle(
                                       fontSize: 14.sp,
                                       fontWeight: FontWeight.w500,
@@ -322,6 +324,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
                     itemCount: filteredProducts.length,
                     itemBuilder: (context, index) {
                       final product = filteredProducts[index];
+                      int serialNumber = index + 1;
                       return Container(
                         margin: EdgeInsets.only(bottom: 8.h),
                         decoration: BoxDecoration(
@@ -346,7 +349,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
                               Expanded(
                                 flex: 2,
                                 child: Text(
-                                  '${product.id ?? 'N/A'}',
+                                  '$serialNumber',
                                   style: TextStyle(
                                     fontSize: 14.sp,
                                     fontWeight: FontWeight.w500,
@@ -408,7 +411,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'ID: ${product.id ?? 'N/A'}',
+                                    'Serial: $serialNumber',
                                     style: TextStyle(
                                       fontSize: 12.sp,
                                       color: Colors.grey.shade600,
@@ -443,9 +446,8 @@ class _ProductListScreenState extends State<ProductListScreen> {
                   ? allProducts
                   : allProducts.where((product) {
                 final productName = product?.productName?.toLowerCase() ?? '';
-                final productId = product?.id?.toString().toLowerCase() ?? '';
                 final query = _searchQuery.toLowerCase();
-                return productName.contains(query) || productId.contains(query);
+                return productName.contains(query);
               }).toList();
               
               return Text(

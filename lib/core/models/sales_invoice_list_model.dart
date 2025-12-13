@@ -50,10 +50,10 @@ class Company {
   });
 
   factory Company.fromJson(Map<String, dynamic> json) => Company(
-    name: json["name"],
-    address: json["address"],
-    phone: json["phone"],
-    email: json["email"],
+    name: json["name"] is String ? json["name"] : (json["name"]?.toString() ?? null),
+    address: json["address"] is String ? json["address"] : (json["address"]?.toString() ?? null),
+    phone: json["phone"] is String ? json["phone"] : (json["phone"]?.toString() ?? null),
+    email: json["email"] is String ? json["email"] : (json["email"]?.toString() ?? null),
   );
 
   Map<String, dynamic> toJson() => {
@@ -86,14 +86,14 @@ class Dealer {
   });
 
   factory Dealer.fromJson(Map<String, dynamic> json) => Dealer(
-    name: json["name"],
-    code: json["code"],
-    type: json["type"],
-    address: json["address"],
-    warehouse: json["warehouse"],
-    territory: json["territory"],
-    employee: json["employee"],
-    dealerCreditDuration: json["dealer_credit_duration"],
+    name: json["name"] is String ? json["name"] : (json["name"]?.toString() ?? null),
+    code: json["code"] is String ? json["code"] : (json["code"]?.toString() ?? null),
+    type: json["type"] is String ? json["type"] : (json["type"]?.toString() ?? null),
+    address: json["address"] is String ? json["address"] : (json["address"]?.toString() ?? null),
+    warehouse: json["warehouse"] is String ? json["warehouse"] : (json["warehouse"]?.toString() ?? null),
+    territory: json["territory"] is String ? json["territory"] : (json["territory"]?.toString() ?? null),
+    employee: json["employee"] is String ? json["employee"] : (json["employee"]?.toString() ?? null),
+    dealerCreditDuration: json["dealer_credit_duration"] is int ? json["dealer_credit_duration"] : (json["dealer_credit_duration"] is String ? int.tryParse(json["dealer_credit_duration"]) : json["dealer_credit_duration"]),
   );
 
   Map<String, dynamic> toJson() => {
@@ -130,14 +130,14 @@ class Financial {
   });
 
   factory Financial.fromJson(Map<String, dynamic> json) => Financial(
-    openingBalance: json["opening_balance"],
-    currentInvoiceValue: json["current_invoice_value"],
-    currentBalance: json["current_balance"],
+    openingBalance: json["opening_balance"] is String ? json["opening_balance"] : (json["opening_balance"]?.toString() ?? null),
+    currentInvoiceValue: json["current_invoice_value"] is String ? json["current_invoice_value"] : (json["current_invoice_value"]?.toString() ?? null),
+    currentBalance: json["current_balance"] is String ? json["current_balance"] : (json["current_balance"]?.toString() ?? null),
     lastPayment: json["last_payment"],
-    totalValue: json["total_value"],
-    commission: json["commission"],
-    payable: json["payable"],
-    payableInWords: json["payable_in_words"],
+    totalValue: json["total_value"] is String ? json["total_value"] : (json["total_value"]?.toString() ?? null),
+    commission: json["commission"] is String ? json["commission"] : (json["commission"]?.toString() ?? null),
+    payable: json["payable"] is String ? json["payable"] : (json["payable"]?.toString() ?? null),
+    payableInWords: json["payable_in_words"] is String ? json["payable_in_words"] : (json["payable_in_words"]?.toString() ?? null),
   );
 
   Map<String, dynamic> toJson() => {
@@ -174,14 +174,14 @@ class Invoice {
   });
 
   factory Invoice.fromJson(Map<String, dynamic> json) => Invoice(
-    invoiceNo: json["invoice_no"],
-    invoiceDate: json["invoice_date"],
-    itemType: json["item_type"],
+    invoiceNo: json["invoice_no"] is String ? json["invoice_no"] : (json["invoice_no"]?.toString() ?? null),
+    invoiceDate: json["invoice_date"] is String ? json["invoice_date"] : (json["invoice_date"]?.toString() ?? null),
+    itemType: json["item_type"] is String ? json["item_type"] : (json["item_type"]?.toString() ?? null),
     transportCost: json["transport_cost"],
-    narration: json["narration"],
-    createdBy: json["created_by"],
-    currentTime: json["current_time"],
-    currentDate: json["current_date"],
+    narration: json["narration"] is String ? json["narration"] : (json["narration"]?.toString() ?? null),
+    createdBy: json["created_by"] is String ? json["created_by"] : (json["created_by"]?.toString() ?? null),
+    currentTime: json["current_time"] is String ? json["current_time"] : (json["current_time"]?.toString() ?? null),
+    currentDate: json["current_date"] is String ? json["current_date"] : (json["current_date"]?.toString() ?? null),
   );
 
   Map<String, dynamic> toJson() => {
@@ -224,17 +224,17 @@ class Item {
   });
 
   factory Item.fromJson(Map<String, dynamic> json) => Item(
-    id: json["id"],
-    productName: json["product_name"],
-    unitPrice: json["unit_price"],
-    qty: json["qty"],
-    weight: json["weight"],
-    weightUnit: json["weight_unit"],
-    unitName: json["unit_name"],
-    bonus: json["bonus"],
-    discountPercentage: json["discount_percentage"],
-    discountAmount: json["discount_amount"],
-    totalPrice: json["total_price"],
+    id: json["id"] is int ? json["id"] : (json["id"] is String ? int.tryParse(json["id"]) : json["id"]),
+    productName: json["product_name"] is String ? json["product_name"] : (json["product_name"]?.toString() ?? null),
+    unitPrice: json["unit_price"] is String ? json["unit_price"] : (json["unit_price"]?.toString() ?? null),
+    qty: json["qty"] is String ? json["qty"] : (json["qty"]?.toString() ?? null),
+    weight: json["weight"] is int ? json["weight"] : (json["weight"] is String ? int.tryParse(json["weight"]) : json["weight"]),
+    weightUnit: json["weight_unit"] is String ? json["weight_unit"] : (json["weight_unit"]?.toString() ?? null),
+    unitName: json["unit_name"] is String ? json["unit_name"] : (json["unit_name"]?.toString() ?? null),
+    bonus: json["bonus"] is int ? json["bonus"] : (json["bonus"] is String ? int.tryParse(json["bonus"]) : json["bonus"]),
+    discountPercentage: json["discount_percentage"] is int ? json["discount_percentage"] : (json["discount_percentage"] is String ? int.tryParse(json["discount_percentage"]) : json["discount_percentage"]),
+    discountAmount: json["discount_amount"] is String ? json["discount_amount"] : (json["discount_amount"]?.toString() ?? null),
+    totalPrice: json["total_price"] is String ? json["total_price"] : (json["total_price"]?.toString() ?? null),
   );
 
   Map<String, dynamic> toJson() => {
