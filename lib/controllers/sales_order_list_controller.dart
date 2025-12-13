@@ -14,7 +14,16 @@ class SalesOrderListController extends GetxController {
       var response = await ApiClient.getData(ApiConstants.getSalesOrderListEndPoint);
       if (response.statusCode == 200) {
         List<dynamic> data = response.body['res']['sales_order_list_info'];
-        salesOrderList.value = data.map((json) => SalesOrderListModel.fromJson(json)).toList();
+        salesOrderList.value = data.map((json) {
+          try {
+            return SalesOrderListModel.fromJson(json);
+          } catch (e) {
+            print('Error parsing sales order item: $e');
+            print('Problematic data: $json');
+            // Return a default model to avoid app crashes
+            return SalesOrderListModel();
+          }
+        }).toList();
       }
     } catch (e) {
       print('Sales Order List error: $e');
@@ -33,9 +42,15 @@ class SalesOrderListController extends GetxController {
       var response = await ApiClient.getData(ApiConstants.getSalesInvoiceListEndPoint(invoiceNo));
       if (response.statusCode == 200) {
         // The response is a single object, not a list
-        SalesInvoiceListModel invoiceData = SalesInvoiceListModel.fromJson(response.body['res']);
-        currentSalesInvoice.value = invoiceData;
-        return invoiceData;
+        try {
+          SalesInvoiceListModel invoiceData = SalesInvoiceListModel.fromJson(response.body['res']);
+          currentSalesInvoice.value = invoiceData;
+          return invoiceData;
+        } catch (e) {
+          print('Error parsing sales invoice: $e');
+          print('Problematic response: ${response.body['res']}');
+          return null;
+        }
       } else {
         print('Sales Invoice List error: ${response.statusText}');
         return null;
