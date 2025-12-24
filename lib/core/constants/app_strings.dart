@@ -1,6 +1,6 @@
 class AppString{
   static const String limitIt = 'SBMS';
-  static const String welcomeLimitIt = 'Welcome to Sbms';
+  static const String welcomeLimitIt = 'Welcome to UAI-CONNECT';
   static const String starting = 'Pure care for every life';
   static const String start = 'Get Started';
   static const String select = 'Select Your Language';
@@ -20,7 +20,7 @@ class AppString{
   static const String login = ' Login';
   static const String signUps = 'Sign Up';
   static const String limit = 'limitIt';
-  static const String loginYour = 'Log in your account';
+  static const String loginYour = 'Login to UAI-Connect';
   static const String allSet = 'All set !\nPassword Successfully Updated';
   static const String loginYourSecurity = 'Log in Securely to access your full app';
   static const String forgetPass = 'Forget Password?';
