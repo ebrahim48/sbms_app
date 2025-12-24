@@ -41,6 +41,10 @@ class $AssetsImagesGen {
   /// File path: assets/images/Logo4.png
   AssetGenImage get logo4 => const AssetGenImage('assets/images/Logo4.png');
 
+  /// File path: assets/images/Logolife.png
+  AssetGenImage get logolife =>
+      const AssetGenImage('assets/images/Logolife.png');
+
   /// File path: assets/images/Logored.png
   AssetGenImage get logored => const AssetGenImage('assets/images/Logored.png');
 
@@ -97,6 +101,7 @@ class $AssetsImagesGen {
   /// List of all assets
   List<AssetGenImage> get values => [
     logo4,
+    logolife,
     logored,
     aboutus,
     banner,

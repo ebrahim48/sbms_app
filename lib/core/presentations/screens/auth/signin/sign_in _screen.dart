@@ -92,6 +92,26 @@ class _LoginInScreenState extends State<LoginInScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      SizedBox(height: 12.h),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Assets.images.logo4.image(
+                            width: 42.w,
+                            height: 42.h,
+                          ),
+                          SizedBox(width: 3.w),
+                          CustomText(
+                            text: 'UNIQUE',
+                            fontsize: 20.sp,
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.textColor3D3D3D,
+                          ),
+
+                        ],
+                      ),
+
+
                       SizedBox(height: 50.h),
 
                       // Title

@@ -886,7 +886,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          "Total Quantity:",
+                          "Order Qty:",
                           style: TextStyle(
                             fontSize: 14.sp,
                             fontWeight: FontWeight.w500,
@@ -908,7 +908,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          "Total Bonus:",
+                          "Bonus Qty:",
                           style: TextStyle(
                             fontSize: 14.sp,
                             fontWeight: FontWeight.w500,
@@ -921,6 +921,28 @@ class _OrderListScreenState extends State<OrderListScreen> {
                             fontSize: 14.sp,
                             fontWeight: FontWeight.bold,
                             color: AppColors.primaryColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 8.h),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Total Qty:",
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black87,
+                          ),
+                        ),
+                        Text(
+                          "${_calculateTotalOrderQuantity()} + ${_calculateTotalBonus()} = ${_calculateTotalWithBonus()}",
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.redAccent,
                           ),
                         ),
                       ],
@@ -1766,6 +1788,22 @@ class _OrderListScreenState extends State<OrderListScreen> {
     }
 
     return totalBonus;
+  }
+
+  // Method to calculate total order quantity
+  int _calculateTotalOrderQuantity() {
+    int totalOrderQty = 0;
+
+    for (int i = 0; i < _selectedProductQuantities.length; i++) {
+      totalOrderQty += _selectedProductQuantities[i].toInt();
+    }
+
+    return totalOrderQty;
+  }
+
+  // Method to calculate total with bonus (order qty + bonus qty)
+  int _calculateTotalWithBonus() {
+    return _calculateTotalOrderQuantity() + _calculateTotalBonus();
   }
 
 }

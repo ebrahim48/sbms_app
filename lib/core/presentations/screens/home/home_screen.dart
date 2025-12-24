@@ -94,11 +94,20 @@ class _HomeContent extends StatelessWidget {
       drawer: _buildAppDrawer(context),
       appBar: AppBar(
         backgroundColor: AppColors.primaryColor,
-        title: const Text(
-          "UAI APPS",
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        title: Row(
+          children: [
+            const Text(
+              "UAI-CONNECT",
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            ),
+            const Spacer(),
+            Assets.images.logo4.image(
+              width: 42.w,
+              height: 42.h,
+            ),
+          ],
         ),
-        centerTitle: true,
+        centerTitle: false,
         elevation: 0,
         leading: Builder(
           builder: (context) => IconButton(
@@ -205,7 +214,7 @@ class _HomeContent extends StatelessWidget {
                 ),
                 SizedBox(height: 10.h),
                 Text(
-                  "Welcome to UAI",
+                  "Welcome to UAI-CONNECT",
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 16.sp,

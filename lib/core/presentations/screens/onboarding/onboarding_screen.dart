@@ -81,15 +81,18 @@ class _OnboardingScreenState extends State<OnboardingScreen>
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                SizedBox(height: 170.h),
+                SizedBox(height: 160.h),
                 Assets.images.logored.image(
                   width: 322.w,
                   height: 301.h,
                 ),
-                SizedBox(height: 12.h),
                 CustomText(
-                  text: AppString.starting,
+                  text: 'Pure care for every life',
                   maxline: 2,
+                  fontsize: 16.sp,
+                  fontWeight: FontWeight.w400,
+                  color: Color(0xFF8B4513),
+                  textAlign: TextAlign.center,
                 ),
                 SizedBox(height: 15.h),
                 CustomText(
@@ -98,8 +101,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                   fontWeight: FontWeight.w700,
                   color: AppColors.primaryColor,
                 ),
-
-                SizedBox(height: 32.h),
+                SizedBox(height: 28.h),
                 Padding(
                   padding:  EdgeInsets.symmetric(vertical: 20,horizontal: 20),
                   child: CustomButton(
@@ -109,7 +111,14 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                       },
 
                   ),
-                )
+                ),
+                SizedBox(height: 12.h),
+                CustomText(
+                  text: 'Powered by SBMS',
+                  fontsize: 12.sp,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.primaryColor,
+                ),
               ],
             ),
 
