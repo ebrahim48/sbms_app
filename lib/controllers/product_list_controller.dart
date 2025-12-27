@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sbms_apps/core/config/app_routes/app_routes.dart';
 
+import '../core/app_constants/app_constants.dart';
+import '../core/helpers/prefs_helper.dart';
 import '../core/helpers/toast_message_helper.dart';
 import '../core/models/dealer_info_model.dart';
 import '../core/models/invoice_number_model.dart';
@@ -35,24 +37,60 @@ class ProductListController extends GetxController {
 
 
 
-
-
   RxBool dealerListLoading = false.obs;
   Rx<DealerInfoModel> dealerList = Rx<DealerInfoModel>(DealerInfoModel());
 
   Future<void> getDealerList() async {
     dealerListLoading.value = true;
     try {
-      var response = await ApiClient.getData(ApiConstants.getDealerListEndPoint);
+      // Get logged in user ID
+      int? userId = await PrefsHelper.getInt(AppConstants.userId);
+
+      // Build endpoint with user_id
+      String endpoint = userId != null
+          ? "${ApiConstants.getDealerListEndPoint}/$userId"
+          : ApiConstants.getDealerListEndPoint;
+
+      var response = await ApiClient.getData(endpoint);
+
       if (response.statusCode == 200) {
-        dealerList.value = DealerInfoModel.fromJson(response.body['res']);
+        // Check if 'res' exists
+        if (response.body['res'] != null) {
+          dealerList.value = DealerInfoModel.fromJson(response.body['res']);
+        } else {
+          // No data found
+          dealerList.value = DealerInfoModel();
+          print('No dealer data found');
+        }
+      } else if (response.statusCode == 404) {
+        // Handle 404 - No data found
+        dealerList.value = DealerInfoModel();
+        print('No dealer data found for this user');
       }
     } catch (e) {
-      print('Product List error: $e');
+      print('Dealer List error: $e');
+      dealerList.value = DealerInfoModel();
     } finally {
       dealerListLoading.value = false;
     }
   }
+
+  // RxBool dealerListLoading = false.obs;
+  // Rx<DealerInfoModel> dealerList = Rx<DealerInfoModel>(DealerInfoModel());
+  //
+  // Future<void> getDealerList() async {
+  //   dealerListLoading.value = true;
+  //   try {
+  //     var response = await ApiClient.getData(ApiConstants.getDealerListEndPoint);
+  //     if (response.statusCode == 200) {
+  //       dealerList.value = DealerInfoModel.fromJson(response.body['res']);
+  //     }
+  //   } catch (e) {
+  //     print('Product List error: $e');
+  //   } finally {
+  //     dealerListLoading.value = false;
+  //   }
+  // }
 
 
 
