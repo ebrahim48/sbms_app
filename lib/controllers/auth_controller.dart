@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
@@ -34,15 +33,15 @@ class AuthController extends GetxController {
       if (response.statusCode == 200 || response.statusCode == 201) {
         // Extract token correctly from the response structure
         String token = response.body["res"]["token"];
-        
+
         // Extract user details
         var userData = response.body["res"]["user"];
         int userId = userData["id"];
         String userName = userData["name"];
-        
+
         // Save token to preferences
         await PrefsHelper.setString(AppConstants.bearerToken, "Bearer $token");
-        
+
         // Save user details
         await PrefsHelper.setString(AppConstants.email, email);
         await PrefsHelper.setString(AppConstants.name, userName);
@@ -51,10 +50,10 @@ class AuthController extends GetxController {
 
         // Show success message
         ToastMessageHelper.showToastMessage("You are logged in", title: 'Success');
-        
+
         // Navigate to home screen
         context.pushNamed(AppRoutes.homeScreen);
-        
+
         return true;
       } else {
         // Handle error response
@@ -65,7 +64,7 @@ class AuthController extends GetxController {
     } catch (e) {
       logInLoading.value = false;
       print("Login error: $e");
-      ToastMessageHelper.showToastMessage("Something went wrong during login", title: 'Error');
+      ToastMessageHelper.showToastMessage("Invalid email or Password", title: 'Error');
       return false;
     }
   }
