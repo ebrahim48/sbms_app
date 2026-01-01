@@ -110,7 +110,7 @@ flutter:
       fonts:
         - asset: assets/fonts/GeneralSans-Bold.otf
         - asset: assets/fonts/GeneralSans-Regular.otf
-        - asset: assets/fonts/DancingScript-Regular.ttf
+
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package

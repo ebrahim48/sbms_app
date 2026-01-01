@@ -3,8 +3,6 @@ import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sbms_apps/core/config/app_routes/app_routes.dart';
 
-import '../core/app_constants/app_constants.dart';
-import '../core/helpers/prefs_helper.dart';
 import '../core/helpers/toast_message_helper.dart';
 import '../core/models/dealer_info_model.dart';
 import '../core/models/invoice_number_model.dart';
@@ -37,60 +35,24 @@ class ProductListController extends GetxController {
 
 
 
+
+
   RxBool dealerListLoading = false.obs;
   Rx<DealerInfoModel> dealerList = Rx<DealerInfoModel>(DealerInfoModel());
 
   Future<void> getDealerList() async {
     dealerListLoading.value = true;
     try {
-      // Get logged in user ID
-      int? userId = await PrefsHelper.getInt(AppConstants.userId);
-
-      // Build endpoint with user_id
-      String endpoint = userId != null
-          ? "${ApiConstants.getDealerListEndPoint}/$userId"
-          : ApiConstants.getDealerListEndPoint;
-
-      var response = await ApiClient.getData(endpoint);
-
+      var response = await ApiClient.getData(ApiConstants.getDealerListEndPoint);
       if (response.statusCode == 200) {
-        // Check if 'res' exists
-        if (response.body['res'] != null) {
-          dealerList.value = DealerInfoModel.fromJson(response.body['res']);
-        } else {
-          // No data found
-          dealerList.value = DealerInfoModel();
-          print('No dealer data found');
-        }
-      } else if (response.statusCode == 404) {
-        // Handle 404 - No data found
-        dealerList.value = DealerInfoModel();
-        print('No dealer data found for this user');
+        dealerList.value = DealerInfoModel.fromJson(response.body['res']);
       }
     } catch (e) {
-      print('Dealer List error: $e');
-      dealerList.value = DealerInfoModel();
+      print('Product List error: $e');
     } finally {
       dealerListLoading.value = false;
     }
   }
-
-  // RxBool dealerListLoading = false.obs;
-  // Rx<DealerInfoModel> dealerList = Rx<DealerInfoModel>(DealerInfoModel());
-  //
-  // Future<void> getDealerList() async {
-  //   dealerListLoading.value = true;
-  //   try {
-  //     var response = await ApiClient.getData(ApiConstants.getDealerListEndPoint);
-  //     if (response.statusCode == 200) {
-  //       dealerList.value = DealerInfoModel.fromJson(response.body['res']);
-  //     }
-  //   } catch (e) {
-  //     print('Product List error: $e');
-  //   } finally {
-  //     dealerListLoading.value = false;
-  //   }
-  // }
 
 
 
@@ -118,10 +80,10 @@ class ProductListController extends GetxController {
 
   RxBool productWisePriceLoading = false.obs;
   Rx<ProductWisePricetModel> productWisePrice = Rx<ProductWisePricetModel>(ProductWisePricetModel());
-  
+
   // Map to store price information for each product ID
   final Map<int, ProductWisePricetModel> productPriceMap = {};
-  
+
   // Loading state for specific product prices
   final Map<int, RxBool> productPriceLoadingMap = {};
 
@@ -140,18 +102,18 @@ class ProductListController extends GetxController {
       productWisePriceLoading.value = false;
     }
   }
-  
+
   // New method to get product-wise price for a specific product ID
   Future<ProductWisePricetModel> getProductWisePriceForProduct(int productId) async {
     // Check if we already have the price in the map
     if (productPriceMap.containsKey(productId)) {
       return productPriceMap[productId]!;
     }
-    
+
     // Mark as loading
     productPriceLoadingMap[productId] ??= false.obs;
     productPriceLoadingMap[productId]!.value = true;
-    
+
     try {
       String endpoint = "/api/v2/get-product-wise-price-info/$productId";
       var response = await ApiClient.getData(endpoint);
@@ -171,14 +133,14 @@ class ProductListController extends GetxController {
     }
     return ProductWisePricetModel();
   }
-  
+
   // Method to clear all cached prices
   void clearProductPriceCache() {
     productPriceMap.clear();
     // Clear loading states too
     productPriceLoadingMap.clear();
   }
-  
+
   // Method to get loading state for a specific product
   bool isProductPriceLoading(int productId) {
     if (productPriceLoadingMap.containsKey(productId)) {
